@@ -126,21 +126,20 @@ A graph $G$ has a topological ordering if and only if it is a DAG (directed acyc
 See Section 3.6 of Algorithms Design by Kleinberg and Tardos.
 \end{proof}
 
-\noindent To solve this issue, we think of an algorithm to reduce the originial graph into a DAG:
+\noindent To solve this issue, we think of an algorithm to reduce the originial graph into a DAG: keep removing the most "unimportant" untils the graph is acyclic. By most "unimportant" we then have to find a way to measure the significance of superiority of one coach against another.
+\\
 
 \begin{algorithm}[H]
-\SetLine % For v3.9
-\While{not at end of simulation}{
-get the pending requests\;
-get cabs that are available\;
-\While{pending requests $\textbf{and}$ available cabs}{
-find the next pending request\;
-find cab closest to the request using Djikstra\;
-cab handle request\;
-once cab handles request, return to a zone proportional to its rate $\lambda$
+\caption{Graph Reduction Algorithm}
+\end{algorithm}
+\begin{algorithm}[H]
+
+
+\While{$G$ is not a DAG}{
+$e$ = edge with the least importance in $G$\;
+Remove $e$ from $G$
 }
-}
-\caption{Global version of algorithm- Djikstra's algorithm used}
+
 \end{algorithm}
 
 
