@@ -39,16 +39,20 @@ class Coachrank():
 				loser_index = self.coach_map[loser]
 
 			new_diff = winning_score - losing_score
-			if new_diff > 0:
-				# # 1 as edge weight
-				self.G.add_edge(loser_index, winner_index, weight=1)
 
-				# # min test score difference as edge weight
-				# if self.G.get_edge_data(loser_index, winner_index):
-				# 	old_diff = self.G[loser_index][winner_index]['weight']
-				# 	self.G[loser_index][winner_index]['weight'] = min(old_diff, new_diff)
-				# else:
-				# 	self.G.add_edge(loser_index, winner_index, weight=new_diff)
+			if new_diff > 0:
+				if self.G.get_edge_data(winner_index, loser_index):
+					rev_weight = self.G[winner_index][loser_index]['weight']
+					if rev_weight > 1:
+						self.G[winner_index][loser_index]['weight'] -= 1
+					elif rev_weight == 1:
+						self.G.remove_edge(winner_index, loser_index)
+				elif self.G.get_edge_data(loser_index, winner_index):
+					self.G[loser_index][winner_index]['weight'] += 1
+				else:
+					self.G.add_edge(loser_index, winner_index, weight=1)
+		print len(self.G.nodes())
+		print len(self.G.edges())
 
 	def coach_rank(self, top_k):
 		result = alg.pagerank(self.G, alpha=0.95)

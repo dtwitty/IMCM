@@ -1,4 +1,13 @@
-THRESHOLD = 5 # At least k games in a season to be considered
+import re
+
+def parse_tuple(s):
+	match = re.match(r"\('(.*)', (.*), '(.*)', (.*)\)", s)
+	groups = match.groups()
+	winner = groups[0]
+	winning_score = int(groups[1])
+	loser = groups[2]
+	losing_score = int(groups[3])
+	return winner, winning_score, loser, losing_score
 
 class Sorter():
 	def __init__(self):
@@ -9,23 +18,21 @@ class Sorter():
 
 	def read_data(self):
 		lines = []
-		f = open("coaches_data.csv", 'r')
-		f.readline()
 		self.coach_map = {}
 		self.reverse_map = {}
+
+		f = open("football_games.txt", 'r')
 		for line in f:
-			line = line.replace("\n", "")
-			toks = line.split(",")
-			toks[0] = toks[0].upper()
-			if len(toks) == 10:
-				coach_id, y, yr, firstname, lastname, sw, sl, pw, pl, t = toks
-				games_played = int(sw) + int(sl) + int(pw) + int(pl)
-				if games_played > THRESHOLD:
-					lines.append(toks)
-					if coach_id not in self.coach_map:
-						index = len(self.coach_map)
-						self.coach_map[coach_id] = {"index": index, "firstname": firstname, "lastname": lastname}
-						self.reverse_map[index] = coach_id
+			winner, winning_score, loser, losing_score = parse_tuple(line)
+			if winner not in self.coach_map:
+				winner_index = len(self.coach_map)
+				self.coach_map[winner] = winner_index
+				self.reverse_map[winner_index] = winner
+			if loser not in self.coach_map:
+				loser_index = len(self.coach_map)
+				self.coach_map[loser] = loser_index
+				self.reverse_map[loser_index] = loser
+			lines.append((winner, winning_score, loser, losing_score))
 
 		self.agg_win = [0] * len(self.coach_map)
 		self.agg_loss = [0] * len(self.coach_map)
@@ -34,20 +41,19 @@ class Sorter():
 		self.agg_playoff_win = [0] * len(self.coach_map)
 		self.agg_playoff_loss = [0] * len(self.coach_map)
 
-		for coach_id, _, _, _, _, s_win, s_loss, p_win, p_loss, _ in lines:
-			index = self.coach_map[coach_id]["index"]
+		for winner, winning_score, loser, losing_score in lines:
+			winner_index = self.coach_map[winner]
+			loser_index = self.coach_map[loser]
 
-			self.agg_win[index] += int(s_win) + int(p_win)
-			self.agg_loss[index] += int(s_loss) + int(p_loss)
-			self.agg_season_win[index] += int(s_win)
-			self.agg_season_loss[index] += int(s_loss)
-			self.agg_playoff_win[index] += int(p_win)
-			self.agg_playoff_loss[index] += int(p_loss)
+			self.agg_win[winner_index] += 1
+			self.agg_loss[loser_index] += 1
+			self.agg_playoff_win[winner_index] += 1
+			self.agg_playoff_loss[loser_index] += 1
+
 
 	def print_result(self, best_coaches):
 		for coach_index in best_coaches:
-			coach_id = self.reverse_map[coach_index]
-			print coach_id, self.coach_map[coach_id]["firstname"], self.coach_map[coach_id]["lastname"],
+			print self.reverse_map[coach_index],
 			print self.agg_playoff_win[coach_index], self.agg_playoff_loss[coach_index],
 			print self.agg_season_win[coach_index], self.agg_season_loss[coach_index]
 
@@ -90,7 +96,7 @@ print "=================AGG WIN/LOSS RATIO SORT========================"
 sorter.agg_ratio_sort(5)
 print "=================AGG NET WIN SORT========================"
 sorter.agg_win_sort(5)
-print "=================LEXI WIN/LOSS RATIO SORT========================"
-sorter.lexi_ratio_sort(5)
-print "=================LEXI NET WIN SORT========================"
-sorter.lexi_win_sort(5)
+# print "=================LEXI WIN/LOSS RATIO SORT========================"
+# sorter.lexi_ratio_sort(5)
+# print "=================LEXI NET WIN SORT========================"
+# sorter.lexi_win_sort(5)
