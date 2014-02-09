@@ -1,0 +1,54 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+\section{Non-Connected Model}
+Perhaps the most naive way of ranking coaches is by their "ratio". That is
+\[s(c) = \frac{w}{w + l}\] 
+This, however, is an easily broken heuristic. As one may see on some shopping or review sites, this heuristic will rate an item with a single 5-star review higher than an item with 400 4-star reviews. This is unacceptable when choosing from hundreds of coaches with a large spread in terms of number of games. 
+
+We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score.
+
+We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
+
+We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the l
+
+The strengths of this model include 
+\begin{itemize}
+\item Easy to understand and implement
+\item Works on the most easily accessible data (career totals)
+\item Does not rely on tuned parameters
+\end{itemize}
+
+The weaknesses of this model include
+\begin{itemize}
+\item Does not use connectivity data between coaches
+\item Relies on ad-hoc heuristics to remove outliers
+\end{itemize}
+
+
+
+\section{Data Collection}
+The accuracy and relevance of our results depended heavily on the quality and volume of data we could collect. That said, data collection was perhaps the most difficult part of our modeling process. We found that data on college sports is much harder to come by than data on professional sports. Within the scope of our search, less popular sports like Hockey simply did not have easily accessible data, especially from before 2001. We often found that when a site stated they had statistics on file, this meant that they had scanned copies of the original documents, which we could not parse.
+
+For data that was available, we had to write web scrapers to collect the human-readable data. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
+
+We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
+
+We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
+
+Finding data for a Baseball was extremely difficult. We were only able to collect career statistics from less than 100 coaches, each with over 1000 wins. That data came from a Wikipedia article, which was backed by the NCAA's coaching records. We did not have the ability to parse the data from the original source, as it was in PDF format. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+
+
+
+\section{Weaknesses}
+Saying nothing about the weaknesses of our models themselves, our results are limited by the amount of data we could collect. Listed below are possible sources of fault.
+\begin{itemize}
+\item We could not consider coaches not in our dataset. For example, John Gagliardi, the coach with the most wins in college Football history, was not in our data set because he competed in the NAIA and NCAA Division III leagues. 
+
+\item Our graph models used only postseason games as input. We justify this heuristically by saying that only skilled coaches will be play in the postseason. However, this produces somewhat sparse graphs, especially compared to those we could have generated if we were able to collect data on every game.
+
+\item Our data for Baseball does not include any data concerning connections between coaches, therefore we could not use our graph model to choose the best baseball coach. Furthermore, we were unable to collect championship-specific data for Baseball coaches.
+\end{itemize}
+
+\end{document}
