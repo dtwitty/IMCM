@@ -274,10 +274,29 @@ $v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
 \noindent There are definitely more information that can be informative, however due to the difficulty of data-mining and significance comparison, we come up with the following updated formula to calculate the weight for edge weight:
 \\
 
-\noindent Let $T$ be the set of all games, $C: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw), .
+\noindent Let $T$ be the set of all games
+\\
+$f: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw)
+\\
+$h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game (1 for season game, 2 for play-off games, 4 for championship games), it is also sport specific since different sport have different game structure, both the above structure can be applied to bastketball, football, and baseball.
+\\
+
+$\beta$ the score multiple, it is specific to a type of sport. For example, in basketball $\beta$ is set to be larger than in football since the score difference is usually much larger. In our model, it is set to be the medium score difference of a sport in the data.
+
 $$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
-$$ C $$
-$$w(v_i, v_j) = \sum$$
+$$w(v_i, v_j) =  \max(0, \sum_{t \in T_{i, j}} h(t) \log(1 + \beta f(t)) - \sum_{t \in T_{j, i}} h(t) \log(1 + \beta f(t))) $$
+$$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
+
+
+
+
+\[
+    {\bf P}(i, j)= 
+\begin{cases}
+    \dfrac{w(v_i, v_j)}{\sum_{w(v_i, v_k) > 0} w(v_i, v_k)},      & \text{if } d(v_i) \geq 1\\
+    \frac{1}{n},              & \text{otherwise}
+\end{cases}
+\]
 
 
 \subsection{Machine Learning Model}
@@ -285,10 +304,6 @@ $$w(v_i, v_j) = \sum$$
 
 
 \section{Results, Validation, and Robustness}
-
-
-$$p_{unreg} = k \ln (t_{reg})$$
-$$\frac{p_{unreg'}}{p_{unreg}}  = \frac{\ln_{t_{reg}}}{ \ln{t_{reg'}}}$$
 
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c | c | c | c | c | }
