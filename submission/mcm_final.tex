@@ -18,8 +18,9 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{tikz}
-\everymath{\displaystyle}
+\usepackage{amssymb}
 
+\everymath{\displaystyle}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -268,10 +269,15 @@ $v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
 \item Game's importance: The more important the game is, the more effort both coaches will put in, and therefore the game result will be more convincing and informative, and more likely coach $i$ will be to give the vote to coach $j$, had coach $i$ lost.
 \item Time in Career: If it is early in the career of coach $i$ when he lost to coach $j$, she is going to put less weight than the game she lost later in her career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone she lost to later in her career.
 \item Game Score: A game lost very close is definitely less convincing than a game entirely dominated by opponent. Therefore the more score coach $i$ lost, the more convinced she will be to give your vote to your opponent.
-
-
 \end{enumerate}
 
+\noindent There are definitely more information that can be informative, however due to the difficulty of data-mining and significance comparison, we come up with the following updated formula to calculate the weight for edge weight:
+\\
+
+\noindent Let $T$ be the set of all games, $C: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw).
+$$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
+$$ C $$
+$$w(v_i, v_j) = \sum$$
 
 
 \subsection{Machine Learning Model}
