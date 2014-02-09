@@ -18,12 +18,15 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{tikz}
-\everymath{\displaystyle}
+\usepackage{amssymb}
 
+\everymath{\displaystyle}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
+
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
 
 \newenvironment{proof}[1][Proof]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
@@ -41,7 +44,7 @@
 
 
 \begin{document}
-\title{Coach Ranking Model}
+\title{A Coach Ranking Model}
 \author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
 \maketitle
 
@@ -73,11 +76,6 @@ Todo
 \subsubsection{Differentiate between Games}
 
 
-
-\subsection{Machine Learning Model}
-
-
-
 \subsection{Graphical Model}
 It comes very natural for us to consider the problem as a graph. The nodes of the graph are the coaches. An edge between two nodes denotes the relation between two coaches, such as the game result of them playing against each other.
 \\
@@ -88,10 +86,10 @@ It comes very natural for us to consider the problem as a graph. The nodes of th
 \noindent Another advantage of this model is that it can aggregate data from different time periods. For example if coach A beats coach B and then retired in 1990, and coach B beat coach C later in 1995, then in the graph we will have a way to compare coach A and coach C because there is a path from A to C through B, even though they never played against each other.
 
 \subsubsection{Topolical Ordering}
-A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $i$ beat $j$ more often than $j$ beat $i$. Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
+A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $j$ beat $i$ more often than $i$ beat $j$ (net-loss). Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
 \\
 
-\noindent Consider the following example. Coach 1 has been beaten by both 2 and 3, coach 2 has been beaten by coach 3 and 4, coach 3 has been beaten by coach 4, and coach 4 is never beaten by anyone. We have a topological ordering in the graph: $\{1, 2, 3, 4\}$, and it is natural to conclude that coach 4 is the best coach among them.
+\noindent Consider the following example. Coach 1 has been beaten by both 2 and 3, coach 2 has been beaten by coach 3 and 4, coach 3 has been beaten by coach 4, and coach 4 is never beaten by anyone. We have a topological ordering in the graph: $\{1, 2, 3, 4\}$, and it is natural to conclude that coach 4 is the best coach among them. (For now, when we talk A is beaten by B, we mean net-loss, which means A is beaten by B more often than B is beaten by A. We will introduce more sophisticated measures later).
 
 \begin{center}
 \begin{tikzpicture}[scale=0.2]
@@ -126,100 +124,274 @@ A graph $G$ has a topological ordering if and only if it is a DAG (directed acyc
 See Section 3.6 of Algorithms Design by Kleinberg and Tardos.
 \end{proof}
 
-\noindent To solve this issue, we think of an algorithm to reduce the originial graph into a DAG:
+\noindent To solve this issue, we think of two algorithms. One is to reduce the originial graph into a DAG: keep removing the most "unimportant" edges untils the graph is acyclic. By most "unimportant" we then have to find a way to measure the importance of an edge. In this model, the weight (or importance) an edge by the net-loss it is associated with:
+
+$$w(e_{i, j}) = \mbox{number of times j beats i} - \mbox{number of times j beats i}$$
+
+\noindent The algorithm then works as following:
+
+\vspace{5mm}
 
 \begin{algorithm}[H]
-\SetLine % For v3.9
-\While{not at end of simulation}{
-get the pending requests\;
-get cabs that are available\;
-\While{pending requests $\textbf{and}$ available cabs}{
-find the next pending request\;
-find cab closest to the request using Djikstra\;
-cab handle request\;
-once cab handles request, return to a zone proportional to its rate $\lambda$
+
+\While{$G$ is not DAG}{
+$e_{min} = \argmin_{e \in E} w(e)$\;
+Remove $e_min$ from $G$
 }
-}
-\caption{Global version of algorithm- Djikstra's algorithm used}
+
 \end{algorithm}
 
+\vspace{5mm}
 
+\noindent However, this algorithm has apparent flaws: suppose even though coach A and coach B only encounter each other once, however it is in the SuperBowl, while the matchup between coach A and coach C is quite often but only in friendly games or early-season games and therefore the result is less important and less indicative of their comparative abilities. Therefore using the net-loss as the only measurement of the importance of an edge can possibly remove the important edge and keep the unimportant ones. We can of course tweak the edge-weight by introducing the importance of a game, the time in both coaches' career when the match happens, etc., but simply adding heuristics seem not like the best approach to the problem.
+\\
 
-\subsubsection{Markov Chain}
+\noindent The second algorithm requires a certain "leap of faith" by introducing randomness into our model:
+
+\subsubsection{Markov Chain (Voting Model)}
+
+To solve the problem of Topogical Ordering, instead of trying to create a DAG to fit the algorithm, we decide adjust the mechanism behind ranking using Topological Ordering.
+\\
+
+\noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
+\\
+
+\noindent Consider the following example. There are four coaches: 1, 2, 3, 4. Coach 1 has been beaten by 1 and 4, coach 2 has been beaten by 3 and 4, coach 3 has been beaten by 4 and 1, coach 4 has never been beaten.
 
 \begin{center}
 \begin{tikzpicture}[scale=0.2]
 \tikzstyle{every node}+=[inner sep=0pt]
-\draw [black] (14.8,-32.3) circle (3);
-\draw (14.8,-32.3) node {$1$};
-\draw [black] (31,-32.3) circle (3);
-\draw (31,-32.3) node {$2$};
-\draw [black] (41,-18.4) circle (3);
-\draw (41,-18.4) node {$3$};
-\draw [black] (56.2,-32.3) circle (3);
-\draw (56.2,-32.3) node {$4$};
-\draw [black] (15.913,-29.517) arc (154.15261:81.74236:21.233);
-\fill [black] (38.07,-17.76) -- (37.35,-17.15) -- (37.21,-18.14);
-\draw (23.28,-19.51) node [above] {$1/3$};
-\draw [black] (17.8,-32.3) -- (28,-32.3);
-\fill [black] (28,-32.3) -- (27.2,-31.8) -- (27.2,-32.8);
-\draw (22.9,-32.8) node [below] {$1/3$};
-\draw [black] (54.626,-34.851) arc (-35.33903:-144.66097:23.446);
-\fill [black] (54.63,-34.85) -- (53.76,-35.21) -- (54.57,-35.79);
-\draw (35.5,-45.24) node [below] {$1/3$};
-\draw [black] (34,-32.3) -- (53.2,-32.3);
-\fill [black] (53.2,-32.3) -- (52.4,-31.8) -- (52.4,-32.8);
-\draw (43.6,-31.8) node [above] {$1/2$};
-\draw [black] (31.468,-29.341) arc (165.67502:122.86066:16.127);
-\fill [black] (38.34,-19.78) -- (37.4,-19.8) -- (37.94,-20.64);
-\draw (33.41,-22.54) node [left] {$1/2$};
-\draw [black] (43.845,-19.346) arc (67.6945:27.42131:21.964);
-\fill [black] (55,-29.55) -- (55.08,-28.61) -- (54.19,-29.07);
-\draw (51.35,-22.97) node [above] {$1$};
+\draw [black] (37.8,-30.2) circle (3);
+\draw (37.8,-30.2) node {$3$};
+\draw [black] (23.1,-30.2) circle (3);
+\draw (23.1,-30.2) node {$1$};
+\draw [black] (37.8,-18.3) circle (3);
+\draw (37.8,-18.3) node {$2$};
+\draw [black] (52.8,-30.2) circle (3);
+\draw (52.8,-30.2) node {$4$};
+\draw [black] (51.691,-32.982) arc (-27.29025:-152.70975:15.462);
+\fill [black] (51.69,-32.98) -- (50.88,-33.46) -- (51.77,-33.92);
+\draw (37.95,-41.86) node [below] {$1/2$};
+\draw [black] (23.506,-27.235) arc (165.22297:92.75902:12.309);
+\fill [black] (34.82,-18.08) -- (33.99,-17.62) -- (34.04,-18.62);
+\draw (25.86,-20.31) node [above] {$1/2$};
+\draw [black] (40.793,-18.226) arc (84.9222:18.22552:13.234);
+\fill [black] (52.19,-27.27) -- (52.42,-26.35) -- (51.47,-26.67);
+\draw (49.65,-20.55) node [above] {$1/2$};
+\draw [black] (34.8,-30.2) -- (26.1,-30.2);
+\fill [black] (26.1,-30.2) -- (26.9,-30.7) -- (26.9,-29.7);
+\draw (30.45,-29.7) node [above] {$1/2$};
+\draw [black] (40.8,-30.2) -- (49.8,-30.2);
+\fill [black] (49.8,-30.2) -- (49,-29.7) -- (49,-30.7);
+\draw (45.3,-30.7) node [below] {$1/2$};
+\draw [black] (37.8,-21.3) -- (37.8,-27.2);
+\fill [black] (37.8,-27.2) -- (38.3,-26.4) -- (37.3,-26.4);
+\draw (37.3,-24.25) node [left] {$1/2$};
 \end{tikzpicture}
 \end{center}
 
+\noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of her vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. We can therefore see this can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
+
+$$ \pi = \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
+
+\noindent where $\bf{P}$ is the probability transition matrix, with $\bf{P}_{i,j}$ equal to the proporption of her chunk coach i will give to j (can also be interpreted as the probability of going from i to j in the Markov Chain):
+
+\[
+\bf{P} = 
+\begin{bmatrix}
+0 & 0.5 & 0.5 & 0 \\
+0 & 0 & 0.5 & 0.5 \\
+0.5 & 0 & 0.5 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\]
+
+\noindent We know that if the Markov Chain is irreducable and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
 
 
-\section{Results, Validation, and Robustness}
+\subsubsection*{Irreducable \& Aperiodic}
+
+\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducable and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
+
+\begin{enumerate}
+\item For dead-ends (coach 4 in the example), in each step she will split her vote into equal pieces and give one piece to every coach, (go to a random state in the Markov Chain)
+\item For non-deadends (coach 1, 2, 3 in the example), in each step with he will first split her vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, spliting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
+\end{enumerate}
+
+\noindent Therefore, after adjusting for deadends in ${\bf P}$, the new probability transition matrix can be represented as:
+
+$${\bf D} = \alpha {\bf P} + (1 - \alpha) {\bf U}$$
+
+\noindent where $\bf{U}$ with all entries equal to $\frac{1}{n}$, $n$ being the total number of coaches (or number of states in the Markov Chain).
+\\
+
+\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducable and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
+
+\subsubsection*{Formal Representation}
+
+$$G(V, E) \mbox{ represents the graph of coaches}$$
+$$V = \{v_1, v_2 ... v_n\} \mbox{ where } v_i \mbox{ is coach i }$$
+$$(v_i, v_j) \in E : \mbox{ coach j beats coach i more often than coach i beats coach j }$$
+
+\[
+    {\bf D} (i, j)= 
+\begin{cases}
+    \alpha \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)} + (1-\alpha)\frac{1}{n},& \text{if } d(v_i) \geq 1\\
+    \frac{1}{n},              & \text{otherwise}
+\end{cases}
+\]
+
+
+\subsubsection*{Efficient Implementation}
+
+Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly can be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use Power Method:
+
+\vspace{5mm}
+
+\begin{algorithm}[H]
+
+$v = (1/n, ... ,1/n)$\;
+\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\| < e^{-8}$}{
+$v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
+}
+\Return $v$\;
+\end{algorithm}
+
+\vspace{5mm}
+
+\noindent Since $v {\bf P}$ can be calculated using sparse matrix ${\bf P}$, this algorithm is much more computationally efficient than simply calculating the eigenvectors of ${\bf D}$. As $\alpha$ increases, the time it takes for $v$ to converge is shorter, but the difference in the ranking might be less significant, therefore this is a tradeoff and we pick $\alpha = 0.95$.
+
+\subsubsection*{More on Edge Weights}
+
+\noindent In the model we introduced above, in situation where $d(v_i) \geq 1$ (which is something we assume in the rest of this section), ${\bf P}(i, j) = \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)}$, where $I\{(v_i, v_j) \in E\}$ is simply an indicator variable indicating whether i has a net-loss against j. However there are a lot more information we can capture, if we think more about the vote coach i will give:
+
+\begin{enumerate}
+\item Game's importance: The more important the game is, the more effort both coaches will put in, and therefore the game result will be more convincing and informative, and more likely coach $i$ will be to give the vote to coach $j$, had coach $i$ lost.
+\item Time in Career: If it is early in the career of coach $i$ when he lost to coach $j$, she is going to put less weight than the game she lost later in her career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone she lost to later in her career.
+\item Game Score: A game lost very close is definitely less convincing than a game entirely dominated by opponent. Therefore the more score coach $i$ lost, the more convinced she will be to give your vote to your opponent.
+\end{enumerate}
+
+\noindent There are definitely more information that can be informative, however due to the difficulty of data-mining and significance comparison, we come up with the following updated formula to calculate the weight for edge weight:
+\\
+
+\noindent Let $T$ be the set of all games
+\\
+$f: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw)
+\\
+$h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game, it is sport specific since different sport have different game structure.
+\\
+$\beta: $ the score multiple, it is specific to a type of sport. For example, in basketball $\beta$ is set to be larger than in football since the score difference is usually much larger. 
+
+$$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
+$$w(v_i, v_j) =  \max(0, \sum_{t \in T_{i, j}} h(t) \log(1 + \beta f(t)) - \sum_{t \in T_{j, i}} h(t) \log(1 + \beta f(t))) $$
+$$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
+
+\[
+    {\bf P}(i, j)= 
+\begin{cases}
+    \dfrac{w(v_i, v_j)}{\sum_{w(v_i, v_k) > 0} w(v_i, v_k)},      & \text{if } d(v_i) \geq 1\\
+    \frac{1}{n},              & \text{otherwise}
+\end{cases}
+\]
+\\
+
+\subsubsection*{Parameter Estimation}
+\noindent $f:$ we approximate $f$ it to be $\frac{1}{\mbox{maximum number of such game a team can play per season}}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. In NCAA, a team 30 season games, 5 tournament games, and 1 championship game, therefore $h(\mbox{season}) = \frac{1}{30}$, $h(\mbox{tournament}) = \frac{1}{5}$, $h(\mbox{championship}) = 1$. Similarly, in College Football, $h(\mbox{season}) = \frac{1}{12}$, $h(\mbox{playoff}) = \frac{1}{2}$, $h(\mbox{championship}) = 1$
+\\
+
+\noindent $\beta:$ it is set to be the medium score difference of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = 9$, $\beta_{football} = 10$. We do not use the mean because there are outliers in the score-difference in the score distribution, as we can see in the following graph:
+\\
 
 \begin{figure}[H]
       \centering
       \begin{subfigure}{0.48\textwidth}
-	\caption{Distribution of Request Source with Airport}
+      \caption{Distribution of Basketball Score Difference}
       \centering
-      \includegraphics[width=1.1\textwidth]{src_with_airport.jpg}
+      \includegraphics[width=1.1\textwidth]{graphs/basketball_diff_dist.jpg}
       \end{subfigure}\quad
       \begin{subfigure}{0.48\textwidth}
-	\caption{Distribution of Request Source without Airport}
+      \caption{Distribution of Football Score Difference}
       \centering
-      \includegraphics[width=1.1\textwidth]{src_without_airport.jpg}
-      \end{subfigure}
-      \begin{subfigure}{0.48\textwidth}
-	\caption{Distribution of Request Destination with Airport}
-      \centering
-      \includegraphics[width=1.1\textwidth]{dest_with_airport.jpg}
-      \end{subfigure}\quad
-      \begin{subfigure}{0.48\textwidth}
-	\caption{Distribution of Request Destination without Airport}
-      \centering
-      \includegraphics[width=1.1\textwidth]{dest_without_airport.jpg}
+      \includegraphics[width=1.1\textwidth]{graphs/football_diff_dist.jpg}
       \end{subfigure}
  \end{figure}
 
-$$p_{unreg} = k \ln (t_{reg})$$
-$$\frac{p_{unreg'}}{p_{unreg}}  = \frac{\ln_{t_{reg}}}{ \ln{t_{reg'}}}$$
+\noindent 
+\\
+
+\noindent There are a lot more possible variation with edge weights in the graphical model. However as more detailed information is added into the model, the less significant difference it is going to make, especially among the top results returned, where the differences between coaches are already quite large. Therefore due to time constraint the above model and method of parameter estimation is the final version we decided to use for our graphical approach. As we can see in later sections, the results are promising.
+
+\subsection{Machine Learning Model}
+
+However, for some type of sports, there are not usually data available for every game this coach played against other coaches. We therefore need to come up of ways to deal with small-data.
+
+\section{Results \& Validation}
+
+\subsection{Graphical Model (Voting Model)}
+
+Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
+
+\subsubsection*{Male College Football}
 
 \begin{center}
-\begin{tabular}{ | c | c | c | c | c | c | c | c | c | }
+\begin{tabular}{ | c | c | }
 \hline
- Number of Cabs & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 \\\hline
-Uni Ind/Conglo & 1.5720  &  1.3773  &  1.2880 &   1.2071 &   1.1932 &  1.2113  &  1.1201  &  1.0672\\\hline
-Prop Ind/Conglo & 1.6876  &  1.4040  &  1.2459  &  1.1248  &  1.2558  &  1.1498  &  1.1033  &  1.1022\\\hline
-Disprop Ind/Conglo & 2.1519  &  2.0706 &   2.0489  &  1.9399  &  1.8725 &   1.8174  &  1.6990 &   1.3905\\
+Coach Name  & Vote \% \\\hline
+Joe Paterno & 0.02574 \\\hline
+Mack Brown  & 0.02002 \\\hline
+Bear Bryant & 0.01797 \\\hline
+Lloyd Carr  & 0.01542 \\\hline
+Howard Schnellenberger  & 0.01234 \\
 \hline
 \end{tabular}
 \end{center}
+
+\subsubsection*{Male College Basketball}
+
+\begin{center}
+\begin{tabular}{ | c | c | }
+\hline
+Coach Name  & Vote \% \\\hline
+Mike Krzyzewski & 0.02388 \\\hline
+Dean Smith  & 0.02370 \\\hline
+John Wooden & 0.02037 \\\hline
+Roy Williams  & 0.01955 \\\hline
+Bob Knight  & 0.01549 \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent If we plot the Vote \% of all the coaches from high to low, we can get the following histogram:
+
+\begin{figure}[H]
+      \centering
+      \begin{subfigure}{1\textwidth}
+      \caption{Male College Football Vote \%}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/football_score_dist.png}
+      \end{subfigure}
+      \begin{subfigure}{1\textwidth}
+      \caption{Male College Basketball Vote \%}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/basketball_score_dist.png}
+      \end{subfigure}
+ \end{figure}
+
+\noindent Comparing the two graphs, we can see some clear similarities and differences.
+
+\begin{enumerate}
+\item The curve drops off very quickly, which means there are large differences between coaches with the top votes.
+\item A small proportion of coaches hold the majority of the votes. In Male College Basketball, $7\%$ of the coaches hold $50\%$ of the votes. In Male College Football, $13.6\%$ of the coaches hold $50\%$ of the votes.
+\item The graph for football have fatter tails than the graph for basketball, indicating that the vote are more spread out. This is a valid result since there are much more uncertainty in football than in basketball.
+\end{enumerate}
+
+\subsubsection*{Assessment}
+
+\noindent Due to the subjective nature of this problem, assessment of the result can be trickly. By comparing both of our results with public polls, and looking at the history information and achievements of coaches selected, we conclude that the result is consistent with public opinions.
+
+\subsubsection*{Robustness}
+
+\noindent Varying parameters $\alpha$ from 0.75 to 0.95, and scaling $\beta$ upwards and downwards by $10\%$, the top 5 coaches returned doesn't have much difference, just with minor rank movement among the top 10 coaches. This is in part due to the quick drop-off rate of the curve above, and the large score differences between top coaches. Therefore, we conclude that the result of the graphical model is valid and it is robust to change in parameters.
 
 \section{Strengths and Weaknesses}
 \subsection{Strengths}
@@ -244,8 +416,8 @@ Todo
 \section{Bibliography}
 \begin{thebibliography}{9}
 
-\bibitem{OSM} OpenStreetMaps API,
-\verb|http://www.openstreetmap.org/#map=14/42.4427/-76.4984|
+\bibitem{NCAA number of games} NCAA Data,
+\verb|http://wiki.answers.com/Q/How_many_games_are_there_in_a_basketball_season#slide=2|
 \bibitem{Gist} Github Gist by user aflaxman,
 \verb|https://gist.github.com/aflaxman/287370/|
 \bibitem{Re} $\text{A stochastic optimization model for real-time ambulance redeployment}$,
