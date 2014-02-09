@@ -44,7 +44,7 @@
 
 
 \begin{document}
-\title{Coach Ranking Model}
+\title{A Coach Ranking Model}
 \author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
 \maketitle
 
@@ -278,17 +278,13 @@ $v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
 \\
 $f: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw)
 \\
-$h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game (1 for season game, 2 for play-off games, 4 for championship games), it is also sport specific since different sport have different game structure, both the above structure can be applied to bastketball, football, and baseball.
+$h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game, it is sport specific since different sport have different game structure.
 \\
-
-$\beta$ the score multiple, it is specific to a type of sport. For example, in basketball $\beta$ is set to be larger than in football since the score difference is usually much larger. In our model, it is set to be the medium score difference of a sport in the data.
+$\beta: $ the score multiple, it is specific to a type of sport. For example, in basketball $\beta$ is set to be larger than in football since the score difference is usually much larger. 
 
 $$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
 $$w(v_i, v_j) =  \max(0, \sum_{t \in T_{i, j}} h(t) \log(1 + \beta f(t)) - \sum_{t \in T_{j, i}} h(t) \log(1 + \beta f(t))) $$
 $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
-
-
-
 
 \[
     {\bf P}(i, j)= 
@@ -297,24 +293,105 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
     \frac{1}{n},              & \text{otherwise}
 \end{cases}
 \]
+\\
 
+\subsubsection*{Parameter Estimation}
+\noindent $f:$ we approximate $f$ it to be $\frac{1}{\mbox{maximum number of such game a team can play per season}}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. In NCAA, a team 30 season games, 5 tournament games, and 1 championship game, therefore $h(\mbox{season}) = \frac{1}{30}$, $h(\mbox{tournament}) = \frac{1}{5}$, $h(\mbox{championship}) = 1$. Similarly, in College Football, $h(\mbox{season}) = \frac{1}{12}$, $h(\mbox{playoff}) = \frac{1}{2}$, $h(\mbox{championship}) = 1$
+\\
+
+\noindent $\beta:$ it is set to be the medium score difference of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = 9$, $\beta_{football} = 10$. We do not use the mean because there are outliers in the score-difference in the score distribution, as we can see in the following graph:
+\\
+
+\begin{figure}[H]
+      \centering
+      \begin{subfigure}{0.48\textwidth}
+      \caption{Distribution of Basketball Score Difference}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/basketball_diff_dist.jpg}
+      \end{subfigure}\quad
+      \begin{subfigure}{0.48\textwidth}
+      \caption{Distribution of Football Score Difference}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/football_diff_dist.jpg}
+      \end{subfigure}
+ \end{figure}
+
+\noindent 
+\\
+
+\noindent There are a lot more possible variation with edge weights in the graphical model. However as more detailed information is added into the model, the less significant difference it is going to make, especially among the top results returned, where the differences between coaches are already quite large. Therefore due to time constraint the above model and method of parameter estimation is the final version we decided to use for our graphical approach. As we can see in later sections, the results are promising.
 
 \subsection{Machine Learning Model}
 
+However, for some type of sports, there are not usually data available for every game this coach played against other coaches. We therefore need to come up of ways to deal with small-data.
 
+\section{Results \& Validation}
 
-\section{Results, Validation, and Robustness}
+\subsection{Graphical Model (Voting Model)}
+
+Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
+
+\subsubsection*{Male College Football}
 
 \begin{center}
-\begin{tabular}{ | c | c | c | c | c | c | c | c | c | }
+\begin{tabular}{ | c | c | }
 \hline
- Number of Cabs & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 \\\hline
-Uni Ind/Conglo & 1.5720  &  1.3773  &  1.2880 &   1.2071 &   1.1932 &  1.2113  &  1.1201  &  1.0672\\\hline
-Prop Ind/Conglo & 1.6876  &  1.4040  &  1.2459  &  1.1248  &  1.2558  &  1.1498  &  1.1033  &  1.1022\\\hline
-Disprop Ind/Conglo & 2.1519  &  2.0706 &   2.0489  &  1.9399  &  1.8725 &   1.8174  &  1.6990 &   1.3905\\
+Coach Name  & Vote \% \\\hline
+Joe Paterno & 0.02574 \\\hline
+Mack Brown  & 0.02002 \\\hline
+Bear Bryant & 0.01797 \\\hline
+Lloyd Carr  & 0.01542 \\\hline
+Howard Schnellenberger  & 0.01234 \\
 \hline
 \end{tabular}
 \end{center}
+
+\subsubsection*{Male College Basketball}
+
+\begin{center}
+\begin{tabular}{ | c | c | }
+\hline
+Coach Name  & Vote \% \\\hline
+Mike Krzyzewski & 0.02388 \\\hline
+Dean Smith  & 0.02370 \\\hline
+John Wooden & 0.02037 \\\hline
+Roy Williams  & 0.01955 \\\hline
+Bob Knight  & 0.01549 \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent If we plot the Vote \% of all the coaches from high to low, we can get the following histogram:
+
+\begin{figure}[H]
+      \centering
+      \begin{subfigure}{1\textwidth}
+      \caption{Male College Football Vote \%}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/football_score_dist.png}
+      \end{subfigure}
+      \begin{subfigure}{1\textwidth}
+      \caption{Male College Basketball Vote \%}
+      \centering
+      \includegraphics[width=1.1\textwidth]{graphs/basketball_score_dist.png}
+      \end{subfigure}
+ \end{figure}
+
+\noindent Comparing the two graphs, we can see some clear similarities and differences.
+
+\begin{enumerate}
+\item The curve drops off very quickly, which means there are large differences between coaches with the top votes.
+\item A small proportion of coaches hold the majority of the votes. In Male College Basketball, $7\%$ of the coaches hold $50\%$ of the votes. In Male College Football, $13.6\%$ of the coaches hold $50\%$ of the votes.
+\item The graph for football have fatter tails than the graph for basketball, indicating that the vote are more spread out. This is a valid result since there are much more uncertainty in football than in basketball.
+\end{enumerate}
+
+\subsubsection*{Assessment}
+
+\noindent Due to the subjective nature of this problem, assessment of the result can be trickly. By comparing both of our results with public polls, and looking at the history information and achievements of coaches selected, we conclude that the result is consistent with public opinions.
+
+\subsubsection*{Robustness}
+
+\noindent Varying parameters $\alpha$ from 0.75 to 0.95, and scaling $\beta$ upwards and downwards by $10\%$, the top 5 coaches returned doesn't have much difference, just with minor rank movement among the top 10 coaches. This is in part due to the quick drop-off rate of the curve above, and the large score differences between top coaches. Therefore, we conclude that the result of the graphical model is valid and it is robust to change in parameters.
 
 \section{Strengths and Weaknesses}
 \subsection{Strengths}
@@ -339,8 +416,8 @@ Todo
 \section{Bibliography}
 \begin{thebibliography}{9}
 
-\bibitem{OSM} OpenStreetMaps API,
-\verb|http://www.openstreetmap.org/#map=14/42.4427/-76.4984|
+\bibitem{NCAA number of games} NCAA Data,
+\verb|http://wiki.answers.com/Q/How_many_games_are_there_in_a_basketball_season#slide=2|
 \bibitem{Gist} Github Gist by user aflaxman,
 \verb|https://gist.github.com/aflaxman/287370/|
 \bibitem{Re} $\text{A stochastic optimization model for real-time ambulance redeployment}$,
