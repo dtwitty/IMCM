@@ -44,7 +44,7 @@
 
 
 \begin{document}
-\title{A Coach Ranking Model}
+\title{CoachRank}
 \author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
 \maketitle
 
@@ -113,7 +113,7 @@ It comes very natural for us to consider the problem as a graph. The nodes of th
 
 \noindent Another advantage of this model is that it can aggregate data from different time periods. For example if coach A beats coach B and then retired in 1990, and coach B beat coach C later in 1995, then in the graph we will have a way to compare coach A and coach C because there is a path from A to C through B, even though they never played against each other.
 
-\subsubsection{Topolical Ordering}
+\subsubsection{Topological Ordering}
 A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $j$ beat $i$ more often than $i$ beat $j$ (net-loss). Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
 \\
 
@@ -220,7 +220,7 @@ To solve the problem of Topogical Ordering, instead of trying to create a DAG to
 
 \noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of her vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. We can therefore see this can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
 
-$$ \pi = \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
+$$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 
 \noindent where $\bf{P}$ is the probability transition matrix, with $\bf{P}_{i,j}$ equal to the proporption of her chunk coach i will give to j (can also be interpreted as the probability of going from i to j in the Markov Chain):
 
@@ -234,12 +234,12 @@ $$ \pi = \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 \end{bmatrix}
 \]
 
-\noindent We know that if the Markov Chain is irreducable and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
+\noindent We know that if the Markov Chain is irreducible and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
 
 
-\subsubsection*{Irreducable \& Aperiodic}
+\subsubsection*{Irreducible \& Aperiodic}
 
-\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducable and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
+\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducible and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
 
 \begin{enumerate}
 \item For dead-ends (coach 4 in the example), in each step she will split her vote into equal pieces and give one piece to every coach, (go to a random state in the Markov Chain)
@@ -253,7 +253,7 @@ $${\bf D} = \alpha {\bf P} + (1 - \alpha) {\bf U}$$
 \noindent where $\bf{U}$ with all entries equal to $\frac{1}{n}$, $n$ being the total number of coaches (or number of states in the Markov Chain).
 \\
 
-\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducable and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
+\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducible and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
 
 \subsubsection*{Formal Representation}
 
@@ -410,7 +410,7 @@ Rick Pitino      & 48     & 15 \\
 \end{tabular}
 \end{center}
 
-\noindent From the result we can clearly see win-percentage is clearly a bad-indicator since there are a lot of noise in the data where some coaches win all of the few games they played. Net-Wins and Squared Win Loss Ratio seem to do reasonably well by comparing the results to public polls and their achievement history. We will further discuss these two results when we compare them to the result of the graphical model.
+\noindent From the result we can clearly see win-percentage is clearly a bad-indicator since there are a lot of noise in the data where some coaches win all of the few games they played. Net-Wins and Squared Win Loss Ratio seem to do reasonably well by comparing the results to public polls and their achievement history.
 
 \subsection{Result of Graphical Model (Voting Model)}
 

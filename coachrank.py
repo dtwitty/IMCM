@@ -22,7 +22,7 @@ class Coachrank():
 		self.reverse_map = {}
 		self.G = nx.DiGraph()
 
-		f = open("football_games.txt", 'r')
+		f = open("basketball_playoff_games.txt", 'r')
 		for line in f:
 			winner, winning_score, loser, losing_score = parse_tuple(line)
 			if winner not in self.coach_map:
@@ -64,12 +64,20 @@ class Coachrank():
 		result_arr = sorted((result[k], k) for k in result.keys())[::-1]
 		self.write_result(result_arr)
 		result_arr = result_arr[:top_k]
+		
 		for v, k in result_arr:
-			# print self.G[k]
-			print self.reverse_map[k], k, v
+			s1 = 0
+			for i, j in self.G.in_edges(k):
+				s1 += self.G[i][j]['weight']
+			s2 = 0
+			for i, j in self.G.out_edges(k):
+				s2 += self.G[i][j]['weight']
+			# print len(self.G.out_edges(k))
+			# print len(self.G.in_edges(k)) - len(self.G.out_edges(k))
+			print self.reverse_map[k], k, v, s1 - s2
 
 	def write_result(self, arr):
-		f = open("wenhai_football_result.csv", "w")
+		f = open("wenhai_basketball_result.csv", "w")
 		for k, v in arr:
 			f.write("%s,%f\n" % (self.reverse_map[v], k))
 		f.close()
