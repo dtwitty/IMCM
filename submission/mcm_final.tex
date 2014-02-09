@@ -44,7 +44,7 @@
 
 
 \begin{document}
-\title{A Coach Ranking Model}
+\title{CoachRank}
 \author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
 \maketitle
 
@@ -63,18 +63,46 @@ Todo
 \end{enumerate}
 
 
-\section{Model assumptions}
+\section{Model Assumptions}
 \begin{enumerate}
 \item Todo
 \end{enumerate}
 
 \section{Models}
 
-\subsection{Simple Heuristic Model}
-\subsubsection{Sorting by Win/Loss Ratio}
-\subsubsection{Sorting by Net Wins}
-\subsubsection{Differentiate between Games}
+\subsection{Simple Win \& Loss Models}
 
+We would like to start with the simplest model as our baseline, and decide where and how we can improve.
+\\
+
+\noindent The most indicative measure of a coach's capability is the number of games she has won and the number of games she has lost, and this information is also easy to obtain. Therefore we start by considering different algorithms to rank coaches based on their number of wins and number of loss.
+
+\subsubsection{Sort by Win Percentage}
+The simplest model is to compute the Win Percentage. Let $V = \{v_1, ... v_n\}$ denotes the set of coaches, $w(v_i)$ returns the number of games $v_i$ has won and $l(v_i)$ returns the number of games $v_i$ has lost. This model can be represented with the function $r_1: V \rightarrow \mathbb{R}$:
+
+$$r_1(v_i) = \frac{w(v_i)}{l(v_i) + w(v_i)}$$
+\\
+
+\noindent This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach who has only played 4 games and won 3 of them doesn't not mean she is better than a coach who has played 100 games and won 70 of them, even though the first coach has better win percentage.
+
+\subsubsection{Sort by Net Wins}
+To take into account the number of games played, we can rank coaches by net wins, $r_2: V \rightarrow \mathbb{R}$:
+
+$$r_2(v_i) = w(v_i) - l(v_i)$$
+\\
+
+\noindent In this model, the more net wins you have, the higher you have, therefore combining both win-percentage and number of games played. Someone might ask: is a coach who has won 100 games and lost 100 games the same as a coach who has won 100?
+
+\subsubsection{Sort by Squared Win \& Loss Ratio}
+Another model can be represented with the function $r_3: V \rightarrow \mathbb{R}$:
+
+$$r_3(v_i) = \frac{w(v_i)^2}{l(v_i) + w(v_i)}$$
+\\
+
+\noindent One can then object, this model, as well as the previous one, will clearly have a bias towards coaches who have coached longer, since an increase in by $w(v_i)$ will have a larger effect than a higher win percentage $\frac{w(v_i)}{w(v_i) + l(v_i)}$
+\\
+
+\noindent The three models above all share the same fundamental flaw: they are both arbitrary and subjective. We are simply picking some heuristics and choose among them the one that we think make the most sense, when we see a problem, we adjust the formula to compensate for it. But we whink we can do better, with the data and information we have:
 
 \subsection{Graphical Model}
 It comes very natural for us to consider the problem as a graph. The nodes of the graph are the coaches. An edge between two nodes denotes the relation between two coaches, such as the game result of them playing against each other.
@@ -85,7 +113,7 @@ It comes very natural for us to consider the problem as a graph. The nodes of th
 
 \noindent Another advantage of this model is that it can aggregate data from different time periods. For example if coach A beats coach B and then retired in 1990, and coach B beat coach C later in 1995, then in the graph we will have a way to compare coach A and coach C because there is a path from A to C through B, even though they never played against each other.
 
-\subsubsection{Topolical Ordering}
+\subsubsection{Topological Ordering}
 A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $j$ beat $i$ more often than $i$ beat $j$ (net-loss). Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
 \\
 
@@ -192,7 +220,7 @@ To solve the problem of Topogical Ordering, instead of trying to create a DAG to
 
 \noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of her vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. We can therefore see this can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
 
-$$ \pi = \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
+$$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 
 \noindent where $\bf{P}$ is the probability transition matrix, with $\bf{P}_{i,j}$ equal to the proporption of her chunk coach i will give to j (can also be interpreted as the probability of going from i to j in the Markov Chain):
 
@@ -206,12 +234,12 @@ $$ \pi = \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 \end{bmatrix}
 \]
 
-\noindent We know that if the Markov Chain is irreducable and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
+\noindent We know that if the Markov Chain is irreducible and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
 
 
-\subsubsection*{Irreducable \& Aperiodic}
+\subsubsection*{Irreducible \& Aperiodic}
 
-\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducable and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
+\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducible and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
 
 \begin{enumerate}
 \item For dead-ends (coach 4 in the example), in each step she will split her vote into equal pieces and give one piece to every coach, (go to a random state in the Markov Chain)
@@ -225,7 +253,7 @@ $${\bf D} = \alpha {\bf P} + (1 - \alpha) {\bf U}$$
 \noindent where $\bf{U}$ with all entries equal to $\frac{1}{n}$, $n$ being the total number of coaches (or number of states in the Markov Chain).
 \\
 
-\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducable and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
+\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducible and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
 
 \subsubsection*{Formal Representation}
 
@@ -233,13 +261,17 @@ $$G(V, E) \mbox{ represents the graph of coaches}$$
 $$V = \{v_1, v_2 ... v_n\} \mbox{ where } v_i \mbox{ is coach i }$$
 $$(v_i, v_j) \in E : \mbox{ coach j beats coach i more often than coach i beats coach j }$$
 
+
+
 \[
-    {\bf D} (i, j)= 
+    {\bf P} (i, j)= 
 \begin{cases}
-    \alpha \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)} + (1-\alpha)\frac{1}{n},& \text{if } d(v_i) \geq 1\\
+    \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)},& \text{if } d(v_i) \geq 1\\
     \frac{1}{n},              & \text{otherwise}
 \end{cases}
 \]
+
+$${\bf D} (i, j) = \alpha {\bf P} (i, j)  + (1-\alpha)\frac{1}{n}$$
 
 
 \subsubsection*{Efficient Implementation}
@@ -251,7 +283,7 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 \begin{algorithm}[H]
 
 $v = (1/n, ... ,1/n)$\;
-\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\| < e^{-8}$}{
+\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\|_2 < e^{-8}$}{
 $v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
 }
 \Return $v$\;
@@ -280,7 +312,7 @@ $f: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (po
 \\
 $h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game, it is sport specific since different sport have different game structure.
 \\
-$\beta: $ the score multiple, it is specific to a type of sport. For example, in basketball $\beta$ is set to be larger than in football since the score difference is usually much larger. 
+$\beta: $ the score difference adjustment, it is specific to a type of sport. For example, in basketball $\beta$ is set to be smaller than in soccer since the score difference in basketball is much larger. 
 
 $$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
 $$w(v_i, v_j) =  \max(0, \sum_{t \in T_{i, j}} h(t) \log(1 + \beta f(t)) - \sum_{t \in T_{j, i}} h(t) \log(1 + \beta f(t))) $$
@@ -295,11 +327,13 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \]
 \\
 
+\noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in Super Bowl, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is just a combination of the two factors: the importance of the game, and the score difference of the loss.
+
 \subsubsection*{Parameter Estimation}
 \noindent $f:$ we approximate $f$ it to be $\frac{1}{\mbox{maximum number of such game a team can play per season}}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. In NCAA, a team 30 season games, 5 tournament games, and 1 championship game, therefore $h(\mbox{season}) = \frac{1}{30}$, $h(\mbox{tournament}) = \frac{1}{5}$, $h(\mbox{championship}) = 1$. Similarly, in College Football, $h(\mbox{season}) = \frac{1}{12}$, $h(\mbox{playoff}) = \frac{1}{2}$, $h(\mbox{championship}) = 1$
 \\
 
-\noindent $\beta:$ it is set to be the medium score difference of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = 9$, $\beta_{football} = 10$. We do not use the mean because there are outliers in the score-difference in the score distribution, as we can see in the following graph:
+\noindent $\beta:$ it is set to be the inverse of the medium score difference of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = \frac{1}{9}$, $\beta_{football} = \frac{1}{10}$. We do not use the mean because there are outliers in the score difference in its distribution, as we can see in the following graph:
 \\
 
 \begin{figure}[H]
@@ -327,36 +361,91 @@ However, for some type of sports, there are not usually data available for every
 
 \section{Results \& Validation}
 
-\subsection{Graphical Model (Voting Model)}
+\subsection{Result of Simple Win \& Loss Models}
+
+Since this will not be our final model, we will simply show the top 5 results of $r_1$, $r_2$, and $r_3$ for Male College Basketball, and due to time-constraint we only have the data for playoff games:
+
+\subsubsection*{Win Percentage}
+
+\begin{center}
+\begin{tabular}{ | c | c | c| }
+\hline
+Coach Name       & Wins  & Loss \\\hline
+Jack Friel       & 2     & 0 \\\hline
+Everett Dean     & 2     & 0 \\\hline
+Elmer Ripley     & 2     & 0 \\\hline
+Earl Brown       & 2     & 0 \\\hline
+Kenneth Loeffler & 8     & 0 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection*{Net Wins}
+
+\begin{center}
+\begin{tabular}{ | c | c | c| }
+\hline
+Coach Name       & Wins   & Loss \\\hline
+Mike Krzyzewski  & 82     & 25 \\\hline
+Roy  Williams    & 62     & 21 \\\hline
+Dean Smith       & 63     & 25 \\\hline
+John Wooden      & 45     & 6 \\\hline
+Rick Pitino      & 48     & 15 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection*{Squared Win \& Loss Ratio}
+
+\begin{center}
+\begin{tabular}{ | c | c | c| }
+\hline
+Coach Name       & Wins   & Loss \\\hline
+Mike Krzyzewski  & 82     & 25 \\\hline
+Roy  Williams    & 62     & 21 \\\hline
+John Wooden      & 45     & 6 \\\hline
+Dean Smith       & 63     & 25 \\\hline
+Rick Pitino      & 48     & 15 \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent From the result we can clearly see win-percentage is clearly a bad-indicator since there are a lot of noise in the data where some coaches win all of the few games they played. Net-Wins and Squared Win Loss Ratio seem to do reasonably well by comparing the results to public polls and their achievement history.
+
+\subsection{Result of Graphical Model (Voting Model)}
 
 Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
 
 \subsubsection*{Male College Football}
 
+\noindent The graph $G(V, E)$ for Male College Football have 529 nodes, 1032 edges, and 27 weakly connected component. The fact that there is no one single connected component is possibly due to the small size of our dataset. The top five coaches are:
+
 \begin{center}
 \begin{tabular}{ | c | c | }
 \hline
-Coach Name  & Vote \% \\\hline
-Joe Paterno & 0.02574 \\\hline
-Mack Brown  & 0.02002 \\\hline
-Bear Bryant & 0.01797 \\\hline
-Lloyd Carr  & 0.01542 \\\hline
-Howard Schnellenberger  & 0.01234 \\
+Coach Name   & Vote \% \\\hline
+Joe Paterno  & 0.02421 \\\hline
+Mack Brown   & 0.01728 \\\hline
+Bear Bryant  & 0.01663 \\\hline
+Lloyd Carr   & 0.01491 \\\hline
+Pete Carroll & 0.01338 \\
 \hline
 \end{tabular}
 \end{center}
 
 \subsubsection*{Male College Basketball}
 
+\noindent The graph $G(V, E)$ for Male College Basketball have 763 nodes, 2582 edges, and 1 weakly connected component. The fact that $G$ is weakly connected is really useful in that it allow us to compare every two coaches in the graph, even though they are playing in different time horizon. The top five coaches are:
+
 \begin{center}
 \begin{tabular}{ | c | c | }
 \hline
 Coach Name  & Vote \% \\\hline
-Mike Krzyzewski & 0.02388 \\\hline
-Dean Smith  & 0.02370 \\\hline
-John Wooden & 0.02037 \\\hline
-Roy Williams  & 0.01955 \\\hline
-Bob Knight  & 0.01549 \\
+Mike Krzyzewski & 0.03272 \\\hline
+Dean Smith  & 0.02544 \\\hline
+Roy Williams & 0.02329 \\\hline
+John Wooden  & 0.02170 \\\hline
+Rick Pitino  & 0.02066 \\
 \hline
 \end{tabular}
 \end{center}
@@ -381,17 +470,19 @@ Bob Knight  & 0.01549 \\
 
 \begin{enumerate}
 \item The curve drops off very quickly, which means there are large differences between coaches with the top votes.
-\item A small proportion of coaches hold the majority of the votes. In Male College Basketball, $7\%$ of the coaches hold $50\%$ of the votes. In Male College Football, $13.6\%$ of the coaches hold $50\%$ of the votes.
+\item A small proportion of coaches hold the majority of the votes. In Male College Basketball, $5.6\%$ of the coaches hold $50\%$ of the votes. In Male College Football, $12.4\%$ of the coaches hold $50\%$ of the votes.
 \item The graph for football have fatter tails than the graph for basketball, indicating that the vote are more spread out. This is a valid result since there are much more uncertainty in football than in basketball.
 \end{enumerate}
 
 \subsubsection*{Assessment}
 
-\noindent Due to the subjective nature of this problem, assessment of the result can be trickly. By comparing both of our results with public polls, and looking at the history information and achievements of coaches selected, we conclude that the result is consistent with public opinions.
+\noindent Due to the subjective nature of this problem, assessment of the result can be trickly. By comparing both of our results with public polls and professional sports media, and looking at the achievements of coaches returned, we conclude that the result is consistent with public opinions.
 
 \subsubsection*{Robustness}
 
 \noindent Varying parameters $\alpha$ from 0.75 to 0.95, and scaling $\beta$ upwards and downwards by $10\%$, the top 5 coaches returned doesn't have much difference, just with minor rank movement among the top 10 coaches. This is in part due to the quick drop-off rate of the curve above, and the large score differences between top coaches. Therefore, we conclude that the result of the graphical model is valid and it is robust to change in parameters.
+
+\subsubsection*{Comparison with Simple Models \& Justification}
 
 \section{Strengths and Weaknesses}
 \subsection{Strengths}
@@ -431,45 +522,5 @@ Todo
 
 
 \end{thebibliography}
-
-\pagebreak
-
-\section{Code}
-
-
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-\lstset{ %	
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  deletekeywords={...},            % if you want to delete keywords from the given language
-  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-  frame=single,                    % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  morekeywords={*,...},            % if you want to add more keywords to the set
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=2,                       % sets default tabsize to 2 spaces
-  title=\lstname,                  % show the filename of files included
-  columns=fullflexible,basicstyle=\ttfamily,  
-  language=Python    
-}
-\begin{lstlisting}[frame=none]
-\end{lstlisting}
 
 \end{document}

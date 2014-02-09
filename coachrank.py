@@ -1,6 +1,7 @@
 import networkx as nx
 from networkx import algorithms as alg
 import re
+import math
 
 def parse_tuple(s):
 	match = re.match(r"\('(.*)', (.*), '(.*)', (.*)\)", s)
@@ -40,26 +41,40 @@ class Coachrank():
 
 			new_diff = winning_score - losing_score
 			if new_diff > 0:
+				add_weight = math.log(1 + 0.1 * new_diff)
 				if self.G.get_edge_data(winner_index, loser_index):
 					rev_weight = self.G[winner_index][loser_index]['weight']
-					if rev_weight > 1:
-						self.G[winner_index][loser_index]['weight'] -= 1
-					elif rev_weight == 1:
+					if rev_weight > add_weight:
+						self.G[winner_index][loser_index]['weight'] -= add_weight
+					elif rev_weight == add_weight:
 						self.G.remove_edge(winner_index, loser_index)
+					else:
+						self.G.remove_edge(winner_index, loser_index)
+						self.G.add_edge(loser_index, winner_index, weight=(add_weight - rev_weight))
 				elif self.G.get_edge_data(loser_index, winner_index):
-					self.G[loser_index][winner_index]['weight'] += 1
+					self.G[loser_index][winner_index]['weight'] += add_weight
 				else:
-					self.G.add_edge(loser_index, winner_index, weight=1)
+					self.G.add_edge(loser_index, winner_index, weight=add_weight)
+		print len(self.G.nodes())
+		print len(self.G.edges())
+		print(nx.number_weakly_connected_components(self.G))
 
 	def coach_rank(self, top_k):
 		result = alg.pagerank(self.G, alpha=0.95)
 		result_arr = sorted((result[k], k) for k in result.keys())[::-1]
-		print [v for v, k in result_arr]
-
-		# self.write_result(result_arr)
+		self.write_result(result_arr)
 		result_arr = result_arr[:top_k]
+		
 		for v, k in result_arr:
-			print self.reverse_map[k], v
+			s1 = 0
+			for i, j in self.G.in_edges(k):
+				s1 += self.G[i][j]['weight']
+			s2 = 0
+			for i, j in self.G.out_edges(k):
+				s2 += self.G[i][j]['weight']
+			# print len(self.G.out_edges(k))
+			# print len(self.G.in_edges(k)) - len(self.G.out_edges(k))
+			print self.reverse_map[k], k, v, s1 - s2
 
 	def write_result(self, arr):
 		f = open("wenhai_basketball_result.csv", "w")
