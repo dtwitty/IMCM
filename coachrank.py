@@ -21,7 +21,7 @@ class Coachrank():
 		self.reverse_map = {}
 		self.G = nx.DiGraph()
 
-		f = open("football_games.txt", 'r')
+		f = open("basketball_playoff_games.txt", 'r')
 		for line in f:
 			winner, winning_score, loser, losing_score = parse_tuple(line)
 			if winner not in self.coach_map:
