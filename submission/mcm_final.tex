@@ -68,10 +68,23 @@ The accuracy and relevance of our results depended heavily on the quality and vo
 \noindent We managed to collect a fair amount of data for Football, Basketball, and Baseball, the most popular college sports. All the data for these three sports were taken from Sports-Reference. \cite{SRDATA} For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 \\
 
+\noindent For College Basketball there are 8 career statistics features that we will use in our model:
+\begin{itemize}
+\item years$\_$active: number of years the coach has been active
+\item wins: number of games the coach has won
+\item start$\_$year: the year the coach started coaching
+\item ncaa$\_$appearances: number of seasons the coach participated in the conference
+\item games: number of all games played by the coach
+\item ff$\_$appearances: number of final four appearances
+\item conf$\_$tourn$\_$wins: number of conference tournament wins
+\item conf$\_$reg$\_$wins: number of conference regular season wins
+\end{itemize}
+
 \noindent We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 \\
 
 \noindent For Baseball, we were only able to collect career statistics for about 100 coaches, each with over 1000 wins.\cite{based} That data was backed by a NCAA PDF \cite{NCAAPDF} that was presumably human-entered. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+\\
 
 \subsection{Coaches vs Teams}
 
@@ -171,7 +184,7 @@ $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distri
 
 \subsubsection*{Irreducibility \& Ergodicity}
 
-\noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank algorithm used by Google:
+\noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank\cite{Pagerank} algorithm used by Google:
 
 \begin{enumerate}
 \item Dead-end coaches (coach 4 in the example), will split her vote into equal pieces at each timestep and give one piece to every coach, (go to a random state in the Markov Chain)
