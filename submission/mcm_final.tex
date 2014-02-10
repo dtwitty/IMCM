@@ -19,9 +19,12 @@
 \fancyhf{}
 \includegraphics[trim= 100 500 100 100]{summary_sheet.pdf}
 
-In this paper, we employ mathematical models, specifically a combination of graphical and machine learning models, to identify the ``all-time greatest male college coach'' of the last century. We gather a wealth of data from online sports resources to provide objective answers to this subjective problem.
+In this paper we employ mathematical models, specifically a combination of graphical and machine learning models, to identify the ``all-time greatest male college coach'' of the last century in the last century for basketball, football, and baseball. Since "best" is ambiguous, we employ a more
+ qualitative approach to assessing our models' ranked coach lists through a combination of popular polls and general consensus.
 
-We develop several models of varying complexity. The simplest models rank coaches based on the most easily-collected data, namely career win and loss totals. We discuss the inherent weaknesses of this approach, and develop a graphical model (which we call CoachRank) that makes more complete use of the data available. We 
+We first consider the available data. We collected career records and postseason appearances for thousands of coaches. We also collect the outcomes of postseason games (NCAA tournament for basketball and bowl games for football). Unfortunately, the amount of data readily available for baseball pales in comparison, and we had to develop a simpler model to choose the best baseball coaches.
+
+We develop several models of varying complexity. The simplest models rank coaches based on the most easily-collected data, namely career win and loss totals. We discuss the inherent strengths and weaknesses of this approach, and develop a graphical model (which we call CoachRank) that makes more complete use of the data available and better models interactions between the coaches. CoachRank compares pairs of coaches based on games played between them to build a directed graph. We find that CoachRank's "best" coaches list is remarkably in line with top polls and intuitively make sense, and the supervised machine learning models extract championship appearances and win ratio as statistically significant attributes after removing heavily correlated attributes. 
 
 \pagestyle{fancyplain}
 \fancyhf{}
@@ -34,7 +37,7 @@ We develop several models of varying complexity. The simplest models rank coache
 \maketitle
 
 \begin{abstract}
-  In this paper, we employ mathematical models, specifically a combination of graphical and machine learning models, to find the 
+  In this paper we employ mathematical models, specifically a combination of graphical and machine learning models, to find the 
 "best all time male college coach" in the last century for basketball, football, and baseball. Since "best" is ambiguous, we employ a more
  qualitative approach to assessing our models' ranked coach lists through a combination of popular polls and Wikipedia. We start with using linear and nonlinear transformations of simple metrics such as wins, losses, games, but move on to create a graphical approach that is better able to model the interactions between coaches which we call CoachRank. Due to the complicated nature of the graphical model, we seek to understand what the most important
 attributes are that CoachRank uses to find the "best coach". We do so through a supervised learning approach to construct interpretable models
