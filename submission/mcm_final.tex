@@ -41,13 +41,13 @@ The accuracy and relevance of our results depended heavily on the quality and vo
 \noindent For what was available, we had to write web scrapers to collect the data in its human-readable format. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
 \\
 
-\noindent We managed to collect a fair amount of data for Football, Basketball, and Baseball, the most popular college sports. All the data for these three sports were taken from Sports-Reference. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
+\noindent We managed to collect a fair amount of data for Football, Basketball, and Baseball, the most popular college sports. All the data for these three sports were taken from Sports-Reference. \cite{SRDATA} For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 \\
 
 \noindent We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 \\
 
-\noindent For Baseball, we were only able to collect career statistics for about 100 coaches, each with over 1000 wins. That data was backed by a NCAA PDF that was presumably human-entered. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+\noindent For Baseball, we were only able to collect career statistics for about 100 coaches, each with over 1000 wins.\cite{based} That data was backed by a NCAA PDF \cite{NCAAPDF} that was presumably human-entered. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
 
 \subsection{Coaches vs Teams}
 
@@ -413,7 +413,31 @@ If we plot the vote \% of all the College Basketball coaches over the start year
 \noindent We can see from the graph that the scores of the coaches have a positive correlation with the start-year of their career. This is reasonbale because first techniques of sports tend to improve overtime and second due to the shortage of data for earlier periods we have more connectivity for coaches in later periods in the graphical model.
 \\
 
-\noindent We also run the graphical model in separate time periods, and the results for the different periods (1900-1930, 1930-1970, 1970-2010) are reasonable baed on information from public polls and professional sports media.
+\noindent We also run the graphical model in separate time periods, and the results for the different periods (1900-1930, 1930-1970, 1970-2010) are reasonable baed on information from public polls and professional sports media. Here are the results of segmenting our dataset into three time periods.
+
+\begin{center}
+
+\begin{tabular}{ | c | c | c| c | c| c| }
+
+\hline
+
+1900-1930  & Vote \% & 1930-1970  & Vote \% & 1970-2010  & Vote \% \\\hline
+
+Elmer Ripley & 0.15947 & John Wooden & 0.07941 & Mike Krzyzewski & 0.05984 \\\hline
+
+Vadal Peterson & 0.12466 & Dean Smith & 0.04433 & Roy Williams & 0.03931\\\hline
+
+Howard Cann  &0.12262 & Fred Taylor & 0.04429 & Rick Pitino & 0.03429\\\hline
+
+Chick Davies & 0.08383 & Pete Newell & 0.04315 & Bill Self & 0.03383 \\\hline
+
+Harol Oolsen & 0.08383 & Phil Woolpert & 0.03836 & Billy Donovan & 0.02777\\
+
+\hline
+
+\end{tabular}
+
+\end{center}
 
 \subsubsection*{Applying the Model to Other Sports}
 
@@ -461,14 +485,12 @@ Given more time, we would have liked to come up with a more objective way of ass
 
 \bibitem{Pagerank} Pagerank Algorithm,
 \verb|http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf|
-\bibitem{Re} $\text{A stochastic optimization model for real-time ambulance redeployment}$,
-\\\verb|http://www.sciencedirect.com/science/article/pii/S0305054813000385|
-\bibitem{Ithaca} Ithaca Demographics,
-\verb|http://www.ci.ithaca.ny.us/maps/index.cfm|
-\bibitem{Cornell} Cornell Demographics,
-\verb|http://www.cornell.edu/about/facts/stats.cfm|
-\bibitem{IC} Ithaca College,
-\verb|http://www.ithaca.edu/admission/facts/|
+\bibitem{SRDATA}
+\verb|http://www.sports-reference.com/|
+\bibitem{based}
+\verb|http://en.wikipedia.org/wiki/List_of_college_baseball_coaches_with_1,000_wins|
+\bibitem{NCAAPDF}
+\verb|http://fs.ncaa.org/Docs/stats/baseball_RB/2011/Coaching.pdf|
 
 
 \end{thebibliography}
