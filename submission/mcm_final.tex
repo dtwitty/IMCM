@@ -1,4 +1,4 @@
-\documentclass[titlepage]{article}
+\documentclass[titlepage,12pt]{article}
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage{fullpage}
 \usepackage{graphicx}
@@ -27,7 +27,7 @@ Sports Illustrated, a magazine for sports enthusiasts, asks, "Who are the greate
 \section{Model Assumptions and Data Collection}
 We make several assumptions in our modeling process:
 \begin{itemize}
-\item The idea of "best all time college coach" is subjective in nature, and to assess our model we have to focus more on qualitative assessment and justification, instead of a quantitative measure.
+\item The idea of ``best all time college coach'' is subjective in nature, and to assess our model we have to focus more on qualitative assessment and justification, instead of a quantitative measure.
 
 \item A coach's rank is determined and only determined by their achievement in the sport they coach, and is unrelated to other factors in their personal life.
 
@@ -39,11 +39,11 @@ The accuracy and relevance of our results depended heavily on the quality and vo
 
 For what was available, we had to write web scrapers to collect the data in its human-readable format. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
 
-We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. \textbf{CITE!}. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
+We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports were taken from Sports-Reference. \textbf{CITE!}. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 
 We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 
-Finding data for a Baseball was extremely difficult. We were only able to collect career statistics for about 100 coaches, each with over 1000 wins. That data was backed by a NCAA PDF that was presumably human-entered. We did not have the ability to parse the data from the original source, else we would have collected data on every coach. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+Finding data for Baseball was extremely difficult. We were only able to collect career statistics for about 100 coaches, each with over 1000 wins. That data was backed by a NCAA PDF that was presumably human-entered. We did not have the ability to parse the data from the original source, else we would have collected data on every coach. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
 
 \subsection{Coaches vs Teams}
 
@@ -55,19 +55,19 @@ We discuss the methodology used for testing this assumption for Basketball and f
 
 \subsection{Simple Win \& Loss Models}
 
-We began with the simplest models and improved with time. Naively, the most indicative measure of a coach's capability is the number of games won and the number of games lost, and this information is also easy to obtain. Therefore we started by considering different algorithms to rank coaches based only on their number of wins and losses.
+We began with the simplest models and continually improved them. Naively, the most indicative measure of a coach's capability is the number of games won and the number of games lost, and this information is also easy to obtain. Therefore we started by considering different algorithms to rank coaches based only on their number of wins and losses.
 
 \subsubsection{Sorting by Win Percentage}
 The simplest model involves computing the win percentage. That is, we score each coach by the ratio of wins to total games. This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach with a 4-1 win-loss record is intuitively not better than a coach with a 100-70 record, though this model would say so.
 
 \subsubsection{Sort by Net Wins}
-Another simple model involves computing net wins. That is, we score each coach by wins minus losses. Intuitively, this scales win-loss percentage with number of games played. However, this can be showed to simply favor coaches who have played more games. 
+Another simple model involves computing net wins. That is, we score each coach by wins minus losses. Intuitively, this takes into account the magnitude of the number of games won and lost. However, this can be shown to simply favor coaches who have played more games. 
 
 \subsubsection{Sort by Squared Win \& Loss Ratio}
-A third simple model involves multiplying the win ratio by the number of wins. This model would appear more robust than the previous two models.
+A third simple model involves multiplying the win ratio by the number of wins. This model is more robust than the previous two models because it takes into account both ratio of wins and losses and the magnitude.
 
 \subsection{Non-Connected Model}
-The problem with the previous three models presented is that they are arbitrary metrics. We apply subjective heuristics in an attempt to glean more ``correct'' results. We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score. Intuitively, this gives a better approximation of a coach's innate winning potential.
+The problem with the previous three models presented is that they are arbitrary metrics: we apply subjective heuristics in an attempt to glean more ``correct'' results. We instead consider a more sophisticated approach: the Wilson score. For each coach, we consider the event that the coach will win when playing any other coach. The observed proportion of wins to losses is the fraction of games the coach wins which follows a binomial distribution. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the mean of this interval and use that as our coach score. Intuitively, this gives a better approximation of a coach's innate winning potential.
 
 The formula is
 \[ \mathrm{score} = 
@@ -82,9 +82,9 @@ The formula is
 \]
 Where $n$ is the total number of games, $\hat{p}$ is the ratio of wins to total games, and $z$ is the $(1 - \alpha/2)$ quantile of the normal distribution. Our model uses 95\% confidence.
 
-We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
+We found that this model produced unsatisfactory results when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
 
-We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the small dataset size and high repute of the coaches in our Baseball dataset, we did not find filtering to be necessary.
+We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the small dataset size and high reputation of the coaches in our Baseball dataset, we did not find filtering to be necessary.
 
 \floatname{algorithm}{Procedure}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -114,24 +114,24 @@ We found that inserting a filtering step dramatically improved results. For Bask
 \end{itemize}
 
 \subsection{Graphical Model}
-We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches. Naturally, the edges between coaches in our graphs are based on games played between them. Depending on the situation, the edges could be weighted and directed either from or towards the better coach.
+We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches. Naturally, the edges between coaches in our graphs are based on games played between them. Depending on the situation, the edges could be weighted and/or directed either to or from the better coach.
 
-The main advantage of a graph-based approach is that it can observe direct interactions between pairs of coaches. It also allows us to apply transitivity to our data. That is, the relationship between two coaches can now be influenced by the pair's interactions with outside coaches. The approach even allows inferences about coach pairs who never played against each other.
+The main advantage of a graph-based approach is that it can observe direct interactions between pairs of coaches rather than considering coaches in isolation. It also allows us to apply transitivity to our data. That is, the relationship between two coaches can now be influenced by the pair's interactions with outside coaches. The approach even allows inferences about coach pairs who never played against each other. [ADD SHIT]
 
 \subsubsection{Topological Ordering}
-The first idea that came to mind was to apply a topological ordering to the graph. That is, if we consider edges between pairs to point to the better coach, we want to remove coaches from the graph such that at time of removal, that coach has no incoming edges (and is therefore the worst coach). The idea is that the coaches removed last would be the best.
+The first idea that came to mind was to apply a topological ordering to the graph. That is, if we consider edges between pairs to point to the better coach, we want to remove coaches from the graph such that at time of removal, that coach has no incoming edges (and is therefore the worst coach). The idea is that the coach removed later would be the better.
 
 The major problem with this approach has to do with cycles. In order to construct a topological sort, we would either need a graph with no cycles (implying an already-existing partial order on coaches), or a mechanism for removing cycles from the graph. We could not create a satisfactory heuristic for removing cycles (that is, one that didn't seem too arbitrary).
 
 \subsubsection{Markov Chain (Voting Model)}
-Rather than a model that required we arbitrarily modify our graph, we decided it would be best to create a model that relied entirely on the structure of the graph.
+Rather than a model that required we remove cycles from our graph, we decided it would be best to create a model that relied entirely on the structure of the graph created from the data.
 
 % current commit ends here
 
-\noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
+\noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which the coach can divide up into pieces. The coach can then give the chunks of the vote to different coaches which he thinks is better than himself. We assume the coaches to be rational: the coach doesn't take into account the opinions of amateurs and public media, and he only gives out votes to the coaches who have beaten him. Then we will rank the coaches based on how many votes each coach eventually gets. Since the coaches form a graph in which there might be cycles, at each timestep a coach can be both receiving and giving votes. What we are interested in is the distribution of the votes in the long term.
 \\
 
-\noindent Consider the following example. There are four coaches: 1, 2, 3, 4. Coach 1 has been beaten by 1 and 4, coach 2 has been beaten by 3 and 4, coach 3 has been beaten by 4 and 1, coach 4 has never been beaten.
+\noindent Consider the following example. There are four coaches: Coach 1, Coach 2, Coach 3, Coach 4. Coach 1 has been beaten by Coaches 2 and 4, Coach 2 has been beaten by Coach 3 and Coach 4, Coach 3 has been beaten by Coach 4 and Coach 1, Coach 4 has never been beaten.
 
 \begin{center}
 \begin{tikzpicture}[scale=0.2]
@@ -165,11 +165,11 @@ Rather than a model that required we arbitrarily modify our graph, we decided it
 \end{tikzpicture}
 \end{center}
 
-\noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of her vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. We can therefore see this can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
+\noindent The Markov Chain above shows how the vote will be given out at each timestep: Coach 1 will give out half of his vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. This can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
 
 $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 
-\noindent where $\bf{P}$ is the probability transition matrix, with $\bf{P}_{i,j}$ equal to the proporption of her chunk coach i will give to j (can also be interpreted as the probability of going from i to j in the Markov Chain):
+\noindent where $\bf{P}$ is the probability transition matrix, with $\bf{P}_{i,j}$ equal to the proportion of coach i will give to coach j (can also be interpreted as the probability of going from i to j in the Markov Chain):
 
 \[
 \bf{P} = 
@@ -181,16 +181,16 @@ $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distri
 \end{bmatrix}
 \]
 
-\noindent We know that if the Markov Chain is irreducible and aperiodic, then such a stationary distribution exists, and is unique, and it is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
+\noindent We know that if the Markov Chain is irreducible and ergodic, then a stationary distribution exists and is unique. This is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
 
 
-\subsubsection*{Irreducible \& Aperiodic}
+\subsubsection*{Irreducible \& Ergodic}
 
-\noindent Apparently, the example we show doesn't satisfy the property. To make sure the matrix we encounter will be irreducible and aperiodic, we use a similar technique as the PageRank algorithm used by Google:
+\noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank algorithm used by Google:
 
 \begin{enumerate}
 \item For dead-ends (coach 4 in the example), in each step she will split her vote into equal pieces and give one piece to every coach, (go to a random state in the Markov Chain)
-\item For non-deadends (coach 1, 2, 3 in the example), in each step with he will first split her vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, spliting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
+\item For non-dead-ends (coach 1, 2, 3 in the example), in each step with he will first split her vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, spliting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
 \end{enumerate}
 
 \noindent Therefore, after adjusting for deadends in ${\bf P}$, the new probability transition matrix can be represented as:
@@ -200,7 +200,7 @@ $${\bf D} = \alpha {\bf P} + (1 - \alpha) {\bf U}$$
 \noindent where $\bf{U}$ with all entries equal to $\frac{1}{n}$, $n$ being the total number of coaches (or number of states in the Markov Chain).
 \\
 
-\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducible and aperiodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the best coaches "of all time" since they get the most proportion of votes from all coaches in the long-run.
+\noindent With the new probability transition matrix, since all entries in $\bf{D}$ are positive, we know by Perron-Frobenius theorem that $\bf{D}$ is both irreducible and ergodic, and that the stationary distribution $\pi$ exists and is unique. With $\pi$ we can find the coaches with the top $5$ probability and they will be the "best" college coaches of all time since they get the most proportion of votes from all coaches in the long-run.
 
 \subsubsection*{Formal Representation}
 
@@ -213,7 +213,7 @@ $$(v_i, v_j) \in E : \mbox{ coach j beats coach i more often than coach i beats 
 \[
     {\bf P} (i, j)= 
 \begin{cases}
-    \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)},& \text{if } d(v_i) \geq 1\\
+    \frac{ I_{\{(v_i, v_j) \in E\}}}{d(v_i)},& \text{if } d(v_i) \geq 1\\
     \frac{1}{n},              & \text{otherwise}
 \end{cases}
 \]
@@ -228,15 +228,15 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 
 \vspace{5mm}
 
-%\begin{algorithm}[H]
-%\begin{algorithmic}
-%$v = (1/n, ... ,1/n)$\;
-%\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\|_2 < e^{-8}$}
-%\State{$v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$}
-%\EndWhile
-%\Return{$v$}
-%\end{algorithmic}
-%\end{algorithm}
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State{$v = (1/n, ... ,1/n)$}
+\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\|_2 < e^{-8}$}
+\State{$v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$}
+\EndWhile
+\Return{$v$}
+\end{algorithmic}
+\end{algorithm}
 
 \vspace{5mm}
 
@@ -244,24 +244,24 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 
 \subsubsection*{Edge Weights}
 
-\noindent In the model we introduced above, in situation where $d(v_i) \geq 1$ (which is something we assume in the rest of this section), ${\bf P}(i, j) = \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)}$, where $I\{(v_i, v_j) \in E\}$ is simply an indicator variable indicating whether i has a net-loss against j. However there are a lot more information we can capture, if we think more about the vote coach i will give:
+\noindent In the model we introduced above, in situations where $d(v_i) \geq 1$, ${\bf P}(i, j) = \frac{ I_{\{(v_i, v_j) \in E\}}}{d(v_i)}$. However there is a lot more information we can capture:
 
 \begin{enumerate}
-\item Game's importance: The more important the game is, the more effort both coaches will put in, and therefore the game result will be more convincing and informative, and more likely coach $i$ will be to give the vote to coach $j$, had coach $i$ lost.
-\item Time in Career: If it is early in the career of coach $i$ when he lost to coach $j$, she is going to put less weight than the game she lost later in her career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone she lost to later in her career.
-\item Game Score: A game lost very close is definitely less convincing than a game entirely dominated by opponent. Therefore the more score coach $i$ lost, the more convinced she will be to give your vote to your opponent.
+\item Importance of the game: The more important the game is, the game result will be more informative, and more likely coach $i$ will be to give the vote to coach $j$.
+\item Career: If it is early in the career of coach $i$ when he lost to coach $j$, she is going to put less weight than the game she lost later in her career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone she lost to later in her career.
+\item Game Score: A close game is less convincing than a game entirely dominated by an opponent. Therefore the more points coach $i$ lost, the more convinced she will be to give her vote to her opponent.
 \end{enumerate}
 
-\noindent There are definitely more information that can be informative, however due to the difficulty of data-mining and significance comparison, we come up with the following updated formula to calculate the weight for edge weight:
+\noindent There is more information we can obtain; however, due to the difficulty of data collection, we come up with the following updated formula to calculate the weight for edge weight:
 \\
 
 \noindent Let $T$ be the set of all games
 \\
-$f: T \rightarrow \mathbb{R}$ map a game to the score difference of the game (positive winning score, 0 if draw)
+$f: T \rightarrow \mathbb{R}$ maps a game to the score difference of the game (positive winning score, 0 if draw)
 \\
 $h: T \rightarrow \mathbb{I}$ returns the importance multiplier of a game, it is sport specific since different sport have different game structure.
 \\
-$\beta: $ the score difference adjustment, it is specific to a type of sport. For example, in basketball $\beta$ is set to be smaller than in soccer since the score difference in basketball is much larger. 
+$\beta: $ the score difference adjustment, it is specific to a type of sport.
 
 $$ T_{i,j} = \{t \in T : \mbox{ coach i lost to coach j in } t\} $$
 $$w(v_i, v_j) =  \max(0, \sum_{t \in T_{i, j}} h(t) \log(1 + \beta f(t)) - \sum_{t \in T_{j, i}} h(t) \log(1 + \beta f(t))) $$
@@ -276,7 +276,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \]
 \\
 
-\noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in Super Bowl, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is just a combination of the two factors: the importance of the game, and the score difference of the loss.
+\noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in championship game, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is just a combination of the two factors: the importance of the game, and the score difference of the loss.
 
 \subsubsection*{Parameter Estimation}
 \noindent $f:$ we approximate $f$ it to be $\frac{1}{\mbox{maximum number of such game a team can play per season}}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. In NCAA, a team 30 season games, 5 tournament games, and 1 championship game, therefore $h(\mbox{season}) = \frac{1}{30}$, $h(\mbox{tournament}) = \frac{1}{5}$, $h(\mbox{championship}) = 1$. Similarly, in College Football, $h(\mbox{season}) = \frac{1}{12}$, $h(\mbox{playoff}) = \frac{1}{2}$, $h(\mbox{championship}) = 1$
