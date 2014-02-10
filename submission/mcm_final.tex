@@ -34,6 +34,10 @@ We make several assumptions in our modeling process:
 \item A coach is considered disjoint from his team. That is, we assume that no coach is unfairly supported by a good team nor unfairly limited by a bad team.
 \end{itemize}
 
+\subsection{Coaches vs Teams}
+
+One of the key assumptions we make in our approach is that in general, "best" coaches are largely independent of the team that they coach. This is a bold claim, but an important one as if this were true it allows us to simply analyze the coaches rather than the specific teams they coached and the players another way. Said another way, the mathematical models would be far more complex if the coaches and teams were tied together in terms of determining who is the "best coach". We discuss the methodology used for testing this assumption for basketball and for conserving space we don't discuss it for fotoball and baseball but test this assumption by constructing a data set that contains $3513$ basketball coaches with all of the teams they have ever coached. For each ${Coach, Team}$ value we have the percentage of games that the team won with that coach. From this dataset we know that if the coach has achieved approximately the same win percentage then we have strong reason to believe that the coaches and teams are independent enough to only construct the mathematical model around coach data without delving into player and team specific data. To test this formally, we use the Pearson chi squared statistical test to test if there is a discrete uniform distribution across the win percentage across all the teams coached. Out of the $3513$ basketball coaches, $755$ of them had coached more than one team in their career. Of these coaches, $87.6\%$ of them had a discrete uniform distribution across the number of win percentages, which largely says that we are fine in constructing mathematical models with just the coach data and not diving into the player data. We repeated similar statistical tests for football and baseball and found similar results.
+
 \section{Data Collection}
 The accuracy and relevance of our results depended heavily on the quality and volume of data we could collect. That said, data collection was perhaps the most difficult part of our modeling process. We found that data on college sports is much harder to come by than data on professional sports. Within the scope of our search, less popular sports like Hockey simply did not have easily accessible data, especially from before 2001. We often found that when a site stated they had statistics on file, this meant that they had scanned copies of the original documents, which we could not parse.
 
@@ -117,10 +121,10 @@ The first idea that came to mind was to apply a topological ordering to the grap
 
 The major problem with this approach has to do with cycles. In order to construct a topological sort, we would either need a graph with no cycles (implying an already-existing partial order on coaches), or a mechanism for removing cycles from the graph. We could not create a satisfactory heuristic for removing cycles (that is, one that didn't seem too arbitrary).
 
-
-% current commit ends here
-
 \subsubsection{Markov Chain (Voting Model)}
+Rather than a model that required we arbitrarily modify our graph, we decided it would be best to create a model that relied entirely on the structure of the graph.
+
+
 
 \noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
 \\
@@ -300,8 +304,62 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 
 \subsection{Machine Learning Model}
 
-However, for some type of sports, there are not usually data available for every game this coach played against other coaches. We therefore need to come up of ways to deal with small-data.
+\noindent So far we have algorithms that produce the top 5 "best coaches" according to historical data, but we coudl also interpret "best" as who has the best chance of winning in the future, or is overall "best" looking forward. Additionally, it is difficult to assess the CoachRank graphical model or more important figure out what attributes of a coach are the most important for defining "best coach". There are a lot of spors fans who may not understand the whole graph model, but can understand certain ket attributed of coaches. This leads us to the use of machine learning methods for tackling this unsupervised learning problem- we found significant difficulty finding structure within the massive amounts of sports data, but we realized that the CoachRank graphical model posed above can bring \textit{structure} to formulate a supervised learning problem. Furthermore, we can use variable selection methods to extract out which are the most important attributes for deciding who the best coach is. 
 
+\subsubsection*{Feature Correlation}
+
+\noindent Before we start to use machine learning methods, it's important to get a feel for the data to make sure the models we produce are intuitively soundsl. After the initial data munging phase, we realized tht a lot of the attributes (now on refered to as features) were correlated, which made sense because our data sets had wins, losses, total games played, etc. To make it the most interpretable model and simple, we removed features that had a high degree of correlation. Below is the Pearson correlation matrix for basketball: 
+
+\begin{figure}[H]
+      \caption{Pearson Correlation matrix for basketabll features}
+      \centering
+      \includegraphics[width=1.0\textwidth]{basketball_cor.jpg}
+\end{figure}
+
+\noindent From the above matrix, we can clearly see that there are some attributes (wins, losses, games, etc.) that are colored dark blue, which we removed moving forward to create a compact set of features that explained what constituted as the "best coach". There are a wealth of supervised machine learning methods that we can use, but we have two defined goals: figure out what features makle up the best coach and assess how well the graphical model works. To best achieve these goals, we decided to use multiple linear regression to figure out how each feature correlates with the coach's CoachRank value. This is also easy to explain to sports fans.
+
+\subsubsection*{Multiple Linear Regression}
+
+Multiple Linear Regression is a supervised machine learning method that predicts a real valued output given a set of features. More formally, the multiple linear regression function is:
+
+\begin{center}
+$E[CoachRankValue|X] = \alpha + \sum_{i=0}^{n} X_{i}$
+\end{center}
+
+\noindent That is, we are finding the conditional expectation of the CoachRank value of a coach given set of features $X$ is the set of features. Since we would not only like to predict CoachRank values for coaches but also individually analyze the features, we handled multicollinearity by using the Pearson correlation matrix above to ensure none of the features were correlated above a minimum threshold of $0.8$. We also looked at the distribution of the features to make sure the homoscedasiticity, weak exogeneity, and independence assumptions of linear regression held true. Below are the results of the multiple linear regression model. 
+
+\vspace{2 mm}
+
+\noindent We notice that the features that are the most signficicant are $ncca-appearances$ and $ff-appearances$, which intuitively make sense and are used in the construction of the CoachRank graphical model. Additioanlly, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and take the largest step in the direction of the most correlated vairbale with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features are the most "important" in determining the CoachRank values. The plot is shown below:
+
+\begin{figure}[H]
+      \caption{LARS of Basketball Features}
+      \centering
+      \includegraphics[width=1.0\textwidth]{basketball_lars.jpg}
+\end{figure}
+
+As expected, the $ncca-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so are able to use the code although it's not publicly released yet.
+
+\subsubsection*{Supersparse Linear Integer Model}
+
+Supersparse Linear Integer Models (SLIM) create predictive scoring systems that are both practical and interpretable. They are widely refered to as intrepretable models because they require users to perform only a few operations to make a prediction. They further restrict the coefficients to a certain set of integral values so that we can better understand the effect of the features on the predicted value. SLIM is formulated as a mixed integer program with an objective function that minimizes 0-1 training loss and $L_0$ and $L_1$ norm to ensure both accuracy, sparsity, and interpretability respectively. Although this is a computationally hard problem (NP-Hard), due the size of our data set and CPLEX solver from IBM we are able to obtain results within a reasonable amount of time. Additionally, as this is a classification model, we had to have a surjective mapping of our real valued CoachRank to discrete buckets ($<0.01$, $>0.02$, etc). Since we had a imbalanced data set from this, that is the number of coaches falling into each bucket varied widely, we used the imbalanced formulation of SLIM. After doing so, we obtained results that, as expected, are close to the results of our multiple linear regression model but now have integral values for the features.        
+
+\begin{center}
+\begin{tabular}{ | c | c |}
+\hline
+Features         & Coefficients \\\hline
+Adolph Rupp      &      \\\hline
+John Wooden      &      \\\hline
+Roy Williams     &      \\\hline
+Jerry Tarkania   &      \\\hline
+Dean Smith       &      \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection*{Tying it together}
+
+Okay, so we have these neat supervised machine learning methods that complement the complicated graphical CoachRank algorithm that we discussed earlier- so what? Well, the purpose of the machine learning methods was two fold: one to extract features from the CoachRank graphical model to actually determine how it's determining what coaches are "best" and two to understand how these features interact with each other and affect the CoachRank value of the coach in a practical and interpretable way, both of which were done through the multiple linear regression model and supersparse linear integer model.
 \section{Results \& Validation}
 
 In this section we are just giving the results of the top-5 coaches for 3 sports. The 3 sports we choose are Male College Basketball, Male College Football, and Male College Baseball. We will start with the result using the Non-connected Model.
