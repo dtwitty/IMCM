@@ -19,8 +19,9 @@
 \fancyhf{}
 \includegraphics[trim= 100 500 100 100]{summary_sheet.pdf}
 
+In this paper, we employ mathematical models, specifically a combination of graphical and machine learning models, to identify the ``all-time greatest male college coach'' of the last century. We gather a wealth of data from online sports resources to provide objective answers to this subjective problem.
 
-blah blah blah summary
+We develop several models of varying complexity. The simplest models rank coaches based on the most easily-collected data, namely career win and loss totals. We discuss the inherent weaknesses of this approach, and develop a graphical model (which we call CoachRank) that makes more complete use of the data available. We 
 
 \pagestyle{fancyplain}
 \fancyhf{}
@@ -344,7 +345,7 @@ games               & 0.00210      \\
 \noindent Although not as important, this model resulted in an adjusted $R^2$ of 0.892, which implies that the set of features fit the CoachRank values quite well. More importantly, the features that were statistically significant at the highest threshold were $ncaa-appearances$ and $ff-appearances$, which intuitively make sense and in fact are used in the construction of the CoachRank graphical model. Additionally, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there currently exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and takes the largest step in the direction of the most correlated variable with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features that are the most "important" in determining the CoachRank values. The plot is shown below:
 
 \begin{figure}[H]
-      \caption{LARS of Basketball Features}
+      \caption{LAR of Basketball Features}
       \centering
       \includegraphics[width=1.0\textwidth]{fixedplot.png}
 \end{figure}
@@ -362,7 +363,7 @@ games               & 5      \\
 \end{tabular}
 \end{center}
 
-\noindent As expected, the $ncaa-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so we were able to use the code although it's not publicly released yet.
+\noindent As expected, the $ncaa$\_$appearances$ and $ff$\_$appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models \cite{SLIM}, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so we were able to use the code although it's not publicly released yet.
 
 \subsubsection*{Supersparse Linear Integer Model}
 
@@ -374,7 +375,7 @@ Supersparse Linear Integer Models (SLIM) create predictive scoring systems that 
 
 \vspace{2 mm}
 
-\noindent A natural question that one may now ask is first how can we extend this trained machine learning models to other time periods and other genders. Well, a nice feature about both the graphical model and the supervised learning model is that they are specifically constructed for specific sports: sure, they might have inputs as "final four appearances" or "bowl games", but almost every sport has major competitions and team games that can be substituted for this. Additionally, not where in either model do we construct the model on any gender specific criteria, so our assumption is that these models above will hold for both genders \textit{assuming} both genders have similar abstract characteristics, which we believe at a first order approximation to be true. As far as different time periods go for the machine learning method, we partitioned the coaches into different data sets depending on their start year and found that the most significant extracted features were in fact largely the same, which is no surprise because there should not be a significant difference between the most important features that determine the best coach between different time periods. However, it is important to note we noticed in earlier time periods (1913-1940), there were less features that were found as statistically significant which might mean that the notion of "best" coach was more simplistic way back when but now has grown more complicated in determining what constitutes as the "best" coach as the game and society has evolved: an interesting observation.    
+\noindent A natural question that one may now ask is first how can we extend this trained machine learning models to other time periods and other genders. Well, a nice feature about both the graphical model and the supervised learning model is that they are specifically constructed for specific sports: sure, they might have inputs as "final four appearances" or "bowl games", but almost every sport has major competitions and team games that can be substituted for this. Additionally, not where in either model do we construct the model on any gender specific criteria, so our assumption is that these models above will hold for both genders \textit{assuming} both genders have similar abstract characteristics, which we believe at a first order approximation to be true but would test rigorously if we had more time. As far as different time periods go for the machine learning method, we partitioned the coaches into different data sets depending on their start year and found that the most significant extracted features were in fact largely the same, which is no surprise because there should not be a significant difference between the most important features that determine the best coach between different time periods. However, it is important to note for earlier time periods (1913-1940), there were less features that were found as statistically significant which might mean that the notion of "best" coach was more simplistic way back when but now has grown more complicated as the game and society have evolved: an interesting observation.    
 
 
 \section{Results \& Validation}
@@ -537,8 +538,8 @@ Given more time, we would have liked to come up with a more objective way of ass
 \verb|http://en.wikipedia.org/wiki/List_of_college_baseball_coaches_with_1,000_wins|
 \bibitem{NCAAPDF} NCAA Coaching PDF,
 \verb|http://fs.ncaa.org/Docs/stats/baseball_RB/2011/Coaching.pdf|
-
+\bibitem{SLIM} Supersparse Linear Integer Models,
+\verb|http://web.mit.edu/rudin/www/UstunTrRuAAAI13.pdf|
 
 \end{thebibliography}
-
 \end{document}
