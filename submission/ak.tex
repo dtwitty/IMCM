@@ -437,11 +437,15 @@ $E[CoachRankValue|X] = \alpha + \sum_{i=0}^{n} X_{i}$
       \end{subfigure}\quad
 \end{figure}
 
+As expected, the $ncca-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so are able to use the code although it's not publicly released yet.
 
+\subsubsection*{Supersparse Linear Integer Model}
+
+Supersparse Linear Integer Models (SLIM) create predictive scoring systems that are both practical and interpretable. They are widely refered to as intrepretable models because they require users to perform only a few operations to make a prediction. They further restrict the coefficients to a certain set of integral values so that we can better understand the effect of the features on the predicted value. SLIM is formulated as a mixed integer program with an objective function that minimizes 0-1 training loss and $L_0$ and $L_1$ norm to ensure both accuracy, sparsity, and interpretability respectively. Although this is a computationally hard problem (NP-Hard), due the size of our data set and CPLEX solver from IBM we are able to obtain results within a reasonable amount of time. Additionally, as this is a classification model, we had to have a surjective mapping of our real valued CoachRank to discrete buckets ($<0.01$, $>0.02$, etc). Since we had a imbalanced data set from this, that is the number of coaches falling into each bucket varied widely, we used the imbalanced formulation of SLIM. After doing so, we obtained results that, as expected, are close to the results of our multiple linear regression model but now have integral values for the features.        
 
 \section{Results \& Validation}
 
-In this section we are just giving the results of the top-5 coaches for 3 sports. The 3 sports we choose are Male College Basketball, Male College Football, and Male College Baseball. We will start with the result using the Non-connected Model.
+In this section we are just giving the results of the top-5 coaches for 3 sports. The 3 sports we choose are Male College Basketball, Male College Football, and Male College Baseball. We will start with the result using the Non-connected Model.    
 
 \subsection{Result of Non-connected Model}
 
