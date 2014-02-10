@@ -68,8 +68,10 @@ The simplest model involves computing the win percentage. That is, we score each
 \subsubsection{Sort by Net Wins}
 Another simple model involves computing net wins. That is, we score each coach by wins minus losses. Intuitively, this takes into account the magnitude of the number of games won and lost. However, this can be shown to simply favor coaches who have played more games. 
 
-\subsubsection{Sort by Squared Win \& Loss Ratio}
-A third simple model involves multiplying the win ratio by the number of wins. This model is more robust than the previous two models because it takes into account both ratio of wins and losses and the magnitude.
+\subsubsection{Sort by Scaled Win Ratio}
+A third simple model involves multiplying the win ratio by the number of wins. This model is more robust than the previous two models because it takes into account both ratio of wins and losses and the magnitude. 
+
+We subjectively considered the results produced by each of these model and decided that sorting by squared win and loss ratio produces the best results with no filtering of the data. This is the model we resort to given only career win and loss data.
 
 \subsection{Graphical Model}
 We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches. Naturally, the edges between coaches in our graphs are based on games played between them. Depending on the situation, the edges could be weighted and/or directed either to or from the better coach.
@@ -368,17 +370,16 @@ Rick Pitino  & 0.02066 \\
 
 \subsubsection*{Male College Baseball}
 
-The graph $G(V, E)$ for Male College Basketball have 64 nodes, 134 edges, and 1 weakly connected component. Compared to Basketball and Football, this dataset is considerably smaller, the top five coaches are:
-
+Due to the lack of connectivity data between baseball coaches, we resort to sorting by scaled win ratio.
 \begin{center}
 \begin{tabular}{ | c | c | c| c | }
 \hline
-Coach Name       & Vote \% \\\hline
-Ed Cheff         & 0.02280 \\\hline
-Mike Martin      & 0.01829 \\\hline
-Gene Stephenson  & 0.01730 \\\hline
-Augie Garrido    & 0.01682 \\\hline
-Gordie Gillespie & 0.01664 \\
+Coach Name       & $w (w / w + l)$ \\\hline
+Ed Cheff         & 1361.60 \\\hline
+Gene Stephenson  & 1343.38 \\\hline
+Mike Martin      & 1316.73 \\\hline
+Augie Garrido    & 1279.37 \\\hline
+Gordie Gillespie & 1259.56 \\
 \hline
 \end{tabular}
 \end{center}
