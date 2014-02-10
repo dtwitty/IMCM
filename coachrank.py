@@ -3,6 +3,10 @@ from networkx import algorithms as alg
 import re
 import math
 
+
+start_year = 1950
+end_year = 2000
+
 def parse_tuple(s):
 	match = re.match(r"\('(.*)', (.*), '(.*)', (.*)\)", s)
 	groups = match.groups()
@@ -23,7 +27,15 @@ class Coachrank():
 		self.reverse_map = {}
 		self.G = nx.DiGraph()
 
-		f = open("basketball_playoff_games.txt", 'r')
+
+		yf = open("football_start_year.csv", "r")
+		yf.readline()
+		for line in yf:
+			_, k, v = line.replace("\n", "").replace("\"", "").split(" ")
+			self.year_map[k] = int(v)
+		yf.close()
+
+		f = open("football_games.txt", 'r')
 		for line in f:
 			winner, winning_score, loser, losing_score = parse_tuple(line)
 			if winner not in self.coach_map:
@@ -41,27 +53,26 @@ class Coachrank():
 				loser_index = self.coach_map[loser]
 
 			new_diff = winning_score - losing_score
-			if new_diff > 0:
-				add_weight = math.log(1 + 0.1 * new_diff)
-				if self.G.get_edge_data(winner_index, loser_index):
-					rev_weight = self.G[winner_index][loser_index]['weight']
-					if rev_weight > add_weight:
-						self.G[winner_index][loser_index]['weight'] -= add_weight
-					elif rev_weight == add_weight:
-						self.G.remove_edge(winner_index, loser_index)
-					else:
-						self.G.remove_edge(winner_index, loser_index)
-						self.G.add_edge(loser_index, winner_index, weight=(add_weight - rev_weight))
-				elif self.G.get_edge_data(loser_index, winner_index):
-					self.G[loser_index][winner_index]['weight'] += add_weight
-				else:
-					self.G.add_edge(loser_index, winner_index, weight=add_weight)
+			if winner in self.year_map and loser in self.year_map:
+				if start_year < self.year_map[winner] and self.year_map[winner] < end_year:
+				 	if start_year < self.year_map[loser] and self.year_map[loser] < end_year:
+						if new_diff > 0:
+							add_weight = math.log(1 + 0.1 * new_diff)
+							if self.G.get_edge_data(winner_index, loser_index):
+								rev_weight = self.G[winner_index][loser_index]['weight']
+								if rev_weight > add_weight:
+									self.G[winner_index][loser_index]['weight'] -= add_weight
+								elif rev_weight == add_weight:
+									self.G.remove_edge(winner_index, loser_index)
+								else:
+									self.G.remove_edge(winner_index, loser_index)
+									self.G.add_edge(loser_index, winner_index, weight=(add_weight - rev_weight))
+							elif self.G.get_edge_data(loser_index, winner_index):
+								self.G[loser_index][winner_index]['weight'] += add_weight
+							else:
+								self.G.add_edge(loser_index, winner_index, weight=add_weight)
 
-		yf = open("", "r")
-		for line in yf:
-			k, v = line.replace("\n", "").split(",")
-			self.year_map[k] = int(v)
-		yf.close()
+
 
 		print len(self.G.nodes())
 		print len(self.G.edges())
@@ -70,7 +81,7 @@ class Coachrank():
 	def coach_rank(self, top_k):
 		result = alg.pagerank(self.G, alpha=0.95)
 		result_arr = sorted((result[k], k) for k in result.keys())[::-1]
-		self.write_result(result_arr)
+		# self.write_result(result_arr)
 		result_arr = result_arr[:top_k]
 		
 		for v, k in result_arr:
@@ -85,9 +96,10 @@ class Coachrank():
 			print self.reverse_map[k], k, v, s1 - s2
 
 	def write_result(self, arr):
-		f = open("wenhai_basketball_result.csv", "w")
+		f = open("wenhai_football_result.csv", "w")
 		for k, v in arr:
-			f.write("%s,%f,%d\n" % (self.reverse_map[v], k, self.year_map[self.reverse_map[v]]))
+			if self.reverse_map[v] in self.year_map:
+				f.write("%s,%d,%f\n" % (self.reverse_map[v], self.year_map[self.reverse_map[v]], k))
 		f.close()
 
 Coachrank()
