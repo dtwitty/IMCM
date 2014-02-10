@@ -78,6 +78,10 @@ The accuracy and relevance of our results depended heavily on the quality and vo
 
 \noindent Finding data for a Baseball was extremely difficult. We were only able to collect career statistics from less than 100 coaches, each with over 1000 wins. That data came from a Wikipedia article, which was backed by the NCAA's coaching records. We did not have the ability to parse the data from the original source, as it was in PDF format. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
 
+\section{Coaches vs Teams}
+
+One of the key assumptions we make in our approach is that in general, "best" coaches are largely independent of the team that they coach. This is a bold claim, but an important one as if this were true it allows us to simply analyze the coaches rather than the specific teams they coached and the players another way. Said another way, the mathematical models would be far more complex if the coaches and teams were tied together in terms of determining who is the "best coach". We discuss the methodology used for testing this assumption for basketball and for conserving space we don't discuss it for fotoball and baseball but test this assumption by constructing a data set that contains $3513$ basketball coaches with all of the teams they have ever coached. For each ${Coach, Team}$ value we have the percentage of games that the team won with that coach. From this dataset we know that if the coach has achieved approximately the same win percentage then we have strong reason to believe that the coaches and teams are independent enough to only construct the mathematical model around coach data without delving into player and team specific data. To test this formally, we use the Pearson chi squared statistical test to test if there is a discrete uniform distribution across the win percentage across all the teams coached. Out of the $3513$ basketball coaches, $755$ of them had coached more than one team in their career. Of these coaches, $87.6\%$ of them had a discrete uniform distribution across the number of win percentages, which largely says that we are fine in constructing mathematical models with just the coach data and not diving into the player data. We repeated similar statistical tests for football and baseball and found similar results.  
+
 
 \section{Models}
 
@@ -406,7 +410,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \begin{figure}[H]
       \centering
       \begin{subfigure}{0.48\textwidth}
-      \caption{Distribution of Basketball Score Difference}
+      \caption{Pearson Correlation matrix for basketabll features}
       \centering
       \includegraphics[width=1.1\textwidth]{graphs/basketball_cors.jpg}
       \end{subfigure}\quad
@@ -426,12 +430,12 @@ $E[CoachRankValue|X] = \alpha + \sum_{i=0}^{n} X_{i}$
 
 \vspace{2 mm}
 
-\noindent We notice that the features that are the most signficicant are $ncca-appearances$ and $ff-appearances$, which intuitively make sense and are used in the construction of the CoachRank graphical model. Additioanlly, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and take the largest step in the direction of the most correlated vairbale with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the dat, LARS provides us which features are the most "important" in determining the CoachRank values. The plot is shown below:
+\noindent We notice that the features that are the most signficicant are $ncca-appearances$ and $ff-appearances$, which intuitively make sense and are used in the construction of the CoachRank graphical model. Additioanlly, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and take the largest step in the direction of the most correlated vairbale with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features are the most "important" in determining the CoachRank values. The plot is shown below:
 
 \begin{figure}[H]
       \centering
       \begin{subfigure}{0.48\textwidth}
-      \caption{Distribution of Basketball Score Difference}
+      \caption{LARS of Basketball Features}
       \centering
       \includegraphics[width=1.1\textwidth]{graphs/basketball_lars.jpg}
       \end{subfigure}\quad
@@ -442,6 +446,23 @@ As expected, the $ncca-appearances$ and $ff-appearances$ enter first and are thu
 \subsubsection*{Supersparse Linear Integer Model}
 
 Supersparse Linear Integer Models (SLIM) create predictive scoring systems that are both practical and interpretable. They are widely refered to as intrepretable models because they require users to perform only a few operations to make a prediction. They further restrict the coefficients to a certain set of integral values so that we can better understand the effect of the features on the predicted value. SLIM is formulated as a mixed integer program with an objective function that minimizes 0-1 training loss and $L_0$ and $L_1$ norm to ensure both accuracy, sparsity, and interpretability respectively. Although this is a computationally hard problem (NP-Hard), due the size of our data set and CPLEX solver from IBM we are able to obtain results within a reasonable amount of time. Additionally, as this is a classification model, we had to have a surjective mapping of our real valued CoachRank to discrete buckets ($<0.01$, $>0.02$, etc). Since we had a imbalanced data set from this, that is the number of coaches falling into each bucket varied widely, we used the imbalanced formulation of SLIM. After doing so, we obtained results that, as expected, are close to the results of our multiple linear regression model but now have integral values for the features.        
+
+\begin{center}
+\begin{tabular}{ | c | c |}
+\hline
+Features         & Coefficients \\\hline
+Adolph Rupp      &      \\\hline
+John Wooden      &      \\\hline
+Roy Williams     &      \\\hline
+Jerry Tarkania   &      \\\hline
+Dean Smith       &      \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection*{Tying it together}
+
+Okay, so we have these neat supervised machine learning methods that complement the complicated graphical CoachRank algorithm that we discussed earlier- so what? Well, the purpose of the machine learning methods was two fold: one to extract features from the CoachRank graphical model to actually determine how it's determining what coaches are "best" and two to understand how these features interact with each other and affect the CoachRank value of the coach in a practical and interpretable way, both of which were done through the multiple linear regression model and supersparse linear integer model.    
 
 \section{Results \& Validation}
 
