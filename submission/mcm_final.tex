@@ -24,30 +24,32 @@
 \section{Introduction}
 Sports Illustrated, a magazine for sports enthusiasts, asks, "Who are the greatest college coaches, male or female, of the last century?" To answer this, we constructed a mathematical model to choose the top coaches in men's Basketball, men's Football, and men's Baseball. We also use these models to consider the difference between coaching in the past and in the present. Finally, we present an article for Sports Illustrated detailing our metrics and results at a non-technical level.
 
-\section{Model Assumptions}
+\section{Model Assumptions and Data Collection}
 We make several assumptions in our modeling process:
 \begin{itemize}
 \item The idea of "best all time college coach" is subjective in nature, and to assess our model we have to focus more on qualitative assessment and justification, instead of a quantitative measure.
 
 \item A coach's rank is determined and only determined by their achievement in the sport they coach, and is unrelated to other factors in their personal life.
 
-\item A coach is considered disjoint from his team. That is, we assume that no coach is unfairly supported by a good team nor unfairly limited by a bad team.
+\item The data we collect is considered true in all circumstances.
 \end{itemize}
 
-\subsection{Coaches vs Teams}
-
-One of the key assumptions we make in our approach is that in general, "best" coaches are largely independent of the team that they coach. This is a bold claim, but an important one as if this were true it allows us to simply analyze the coaches rather than the specific teams they coached and the players another way. Said another way, the mathematical models would be far more complex if the coaches and teams were tied together in terms of determining who is the "best coach". We discuss the methodology used for testing this assumption for basketball and for conserving space we don't discuss it for fotoball and baseball but test this assumption by constructing a data set that contains $3513$ basketball coaches with all of the teams they have ever coached. For each ${Coach, Team}$ value we have the percentage of games that the team won with that coach. From this dataset we know that if the coach has achieved approximately the same win percentage then we have strong reason to believe that the coaches and teams are independent enough to only construct the mathematical model around coach data without delving into player and team specific data. To test this formally, we use the Pearson chi squared statistical test to test if there is a discrete uniform distribution across the win percentage across all the teams coached. Out of the $3513$ basketball coaches, $755$ of them had coached more than one team in their career. Of these coaches, $87.6\%$ of them had a discrete uniform distribution across the number of win percentages, which largely says that we are fine in constructing mathematical models with just the coach data and not diving into the player data. We repeated similar statistical tests for football and baseball and found similar results.
-
-\section{Data Collection}
+\subsection{Data Collection}
 The accuracy and relevance of our results depended heavily on the quality and volume of data we could collect. That said, data collection was perhaps the most difficult part of our modeling process. We found that data on college sports is much harder to come by than data on professional sports. Within the scope of our search, less popular sports like Hockey simply did not have easily accessible data, especially from before 2001. We often found that when a site stated they had statistics on file, this meant that they had scanned copies of the original documents, which we could not parse.
 
 For what was available, we had to write web scrapers to collect the data in its human-readable format. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
 
-We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. \textbf{CITE!}. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
+We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. \textbf{CITE!}. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 
-We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
+We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 
 Finding data for a Baseball was extremely difficult. We were only able to collect career statistics for about 100 coaches, each with over 1000 wins. That data was backed by a NCAA PDF that was presumably human-entered. We did not have the ability to parse the data from the original source, else we would have collected data on every coach. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+
+\subsection{Coaches vs Teams}
+
+One of the key assumptions we make in our approach is that in general, "best" coaches are largely independent of the team that they coach. This is a bold claim, but an important one as if this were true it allows us to simply analyze the coaches rather than the specific teams they coached and the players another way. Said another way, the mathematical models would be far more complex if the coaches and teams were tied together in terms of determining who is the "best coach". 
+
+We discuss the methodology used for testing this assumption for Basketball and for conserving space we don't discuss it for Football. Our baseball dataset was to small to test this assumption. We test this assumption by observing the per-school statistics for each coach. For each (Coach, School) pair we have the percentage of games that the team won with that coach. From this dataset we know that if the coach has achieved approximately the same win percentage then we have strong reason to believe that the coaches and teams are independent enough to only construct the mathematical model around coach data without delving into player and team specific data. To test this formally, we use the Pearson chi squared statistical test to test if there is a discrete uniform distribution across the win percentage across all the teams coached. Out of the $3513$ basketball coaches, $755$ of them had coached more than one team in their career. Of these coaches, $87.6\%$ of them had a discrete uniform distribution across the number of win percentages, which largely says that we are fine in constructing mathematical models with just the coach data and not diving into the player data. We repeated similar statistical tests for football and found similar results.
 
 \section{Models}
 
@@ -124,7 +126,7 @@ The major problem with this approach has to do with cycles. In order to construc
 \subsubsection{Markov Chain (Voting Model)}
 Rather than a model that required we arbitrarily modify our graph, we decided it would be best to create a model that relied entirely on the structure of the graph.
 
-
+% current commit ends here
 
 \noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
 \\
