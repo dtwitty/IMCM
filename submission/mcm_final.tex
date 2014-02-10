@@ -108,77 +108,19 @@ We found that inserting a filtering step dramatically improved results. For Bask
 \end{itemize}
 
 \subsection{Graphical Model}
-We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches.
+We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches. Naturally, the edges between coaches in our graphs are based on games played between them. Depending on the situation, the edges could be weighted and directed either from or towards the better coach.
 
-The main advantage over a graph-based approach is that it can observe direct interactions between pairs of coaches. It also allows us to apply transitivity to our data. That is, the relationship between two coaches can now be influenced by the pair's interactions with outside coaches. The approach even allows inferences about coach pairs who never played against each other. 
+The main advantage of a graph-based approach is that it can observe direct interactions between pairs of coaches. It also allows us to apply transitivity to our data. That is, the relationship between two coaches can now be influenced by the pair's interactions with outside coaches. The approach even allows inferences about coach pairs who never played against each other.
 
 \subsubsection{Topological Ordering}
-A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $j$ beat $i$ more often than $i$ beat $j$ (net-loss). Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
-\\
+The first idea that came to mind was to apply a topological ordering to the graph. That is, if we consider edges between pairs to point to the better coach, we want to remove coaches from the graph such that at time of removal, that coach has no incoming edges (and is therefore the worst coach). The idea is that the coaches removed last would be the best.
 
-\noindent Consider the following example. Coach 1 has been beaten by both 2 and 3, coach 2 has been beaten by coach 3 and 4, coach 3 has been beaten by coach 4, and coach 4 is never beaten by anyone. We have a topological ordering in the graph: $\{1, 2, 3, 4\}$, and it is natural to conclude that coach 4 is the best coach among them. (For now, when we talk A is beaten by B, we mean net-loss, which means A is beaten by B more often than B is beaten by A. We will introduce more sophisticated measures later).
+The major problem with this approach has to do with cycles. In order to construct a topological sort, we would either need a graph with no cycles (implying an already-existing partial order on coaches), or a mechanism for removing cycles from the graph. We could not create a satisfactory heuristic for removing cycles (that is, one that didn't seem too arbitrary).
 
-\begin{center}
-\begin{tikzpicture}[scale=0.2]
-\tikzstyle{every node}+=[inner sep=0pt]
-\draw [black] (16.1,-27.9) circle (3);
-\draw (16.1,-27.9) node {$1$};
-\draw [black] (30.2,-27.9) circle (3);
-\draw (30.2,-27.9) node {$2$};
-\draw [black] (44.7,-27.9) circle (3);
-\draw (44.7,-27.9) node {$3$};
-\draw [black] (59.2,-27.9) circle (3);
-\draw (59.2,-27.9) node {$4$};
-\draw [black] (19.1,-27.9) -- (27.2,-27.9);
-\fill [black] (27.2,-27.9) -- (26.4,-27.4) -- (26.4,-28.4);
-\draw [black] (33.2,-27.9) -- (41.7,-27.9);
-\fill [black] (41.7,-27.9) -- (40.9,-27.4) -- (40.9,-28.4);
-\draw [black] (47.7,-27.9) -- (56.2,-27.9);
-\fill [black] (56.2,-27.9) -- (55.4,-27.4) -- (55.4,-28.4);
-\draw [black] (17.843,-25.463) arc (139.24738:40.75262:16.577);
-\fill [black] (42.96,-25.46) -- (42.81,-24.53) -- (42.06,-25.18);
-\draw [black] (57.453,-30.334) arc (-40.77401:-139.22599:16.84);
-\fill [black] (57.45,-30.33) -- (56.55,-30.61) -- (57.31,-31.27);
-\end{tikzpicture}
-\end{center}
 
-\noindent However, one natural limitation of this model is the following theorem:
-
-\begin{theorem}
-A graph $G$ has a topological ordering if and only if it is a DAG (directed acyclic graph).
-\end{theorem}
-\begin{proof}
-See Section 3.6 of Algorithms Design by Kleinberg and Tardos.
-\end{proof}
-
-\noindent To solve this issue, we think of two algorithms. One is to reduce the originial graph into a DAG: keep removing the most "unimportant" edges untils the graph is acyclic. By most "unimportant" we then have to find a way to measure the importance of an edge. In this model, the weight (or importance) an edge by the net-loss it is associated with:
-
-$$w(e_{i, j}) = \mbox{number of times j beats i} - \mbox{number of times j beats i}$$
-
-\noindent The algorithm then works as following:
-
-\vspace{5mm}
-
-%\begin{algorithm}[H]
-%\begin{algorithmic}
-%\While{$G$ is not DAG}
-%\State{$e_{min} = \argmin_{e \in E} w(e)$}
-%\State{Remove $e_min$ from $G$}
-%\EndWhile
-%\end{algorithmic}
-%\end{algorithm}
-
-\vspace{5mm}
-
-\noindent However, this algorithm has apparent flaws: suppose even though coach A and coach B only encounter each other once, however it is in the SuperBowl, while the matchup between coach A and coach C is quite often but only in friendly games or early-season games and therefore the result is less important and less indicative of their comparative abilities. Therefore using the net-loss as the only measurement of the importance of an edge can possibly remove the important edge and keep the unimportant ones. We can of course tweak the edge-weight by introducing the importance of a game, the time in both coaches' career when the match happens, etc., but simply adding heuristics seem not like the best approach to the problem.
-\\
-
-\noindent The second algorithm requires a certain "leap of faith" by introducing randomness into our model:
+% current commit ends here
 
 \subsubsection{Markov Chain (Voting Model)}
-
-To solve the problem of Topogical Ordering, instead of trying to create a DAG to fit the algorithm, we decide adjust the mechanism behind ranking using Topological Ordering.
-\\
 
 \noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
 \\
