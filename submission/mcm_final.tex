@@ -169,16 +169,16 @@ $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distri
 \noindent We know that if the Markov Chain is irreducible and ergodic, then a stationary distribution exists and is unique. This is the left eigenvector of $\bf{P}$ for the eigenvalue 1.
 
 
-\subsubsection*{Irreducible \& Ergodic}
+\subsubsection*{Irreducibility \& Ergodicity}
 
 \noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank algorithm used by Google:
 
 \begin{enumerate}
-\item For dead-ends (coach 4 in the example), in each step she will split her vote into equal pieces and give one piece to every coach, (go to a random state in the Markov Chain)
-\item For non-dead-ends (coach 1, 2, 3 in the example), in each step with he will first split her vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, spliting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
+\item Dead-end coaches (coach 4 in the example), will split her vote into equal pieces at each timestep and give one piece to every coach, (go to a random state in the Markov Chain)
+\item For non-dead-end coaches (coaches 1, 2, 3 in the example), in each step, will first split their vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, splitting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
 \end{enumerate}
 
-\noindent Therefore, after adjusting for deadends in ${\bf P}$, the new probability transition matrix can be represented as:
+\noindent Therefore, after adjusting for dead-ends in ${\bf P}$, the new probability transition matrix can be represented as:
 
 $${\bf D} = \alpha {\bf P} + (1 - \alpha) {\bf U}$$
 
@@ -209,7 +209,7 @@ $${\bf D} (i, j) = \alpha {\bf P} (i, j)  + (1-\alpha)\frac{1}{n}$$
 \subsubsection*{Efficient Implementation}
 
 
-Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly can be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use Power Method:
+Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly could be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use Power Method:
 
 \vspace{5mm}
 
