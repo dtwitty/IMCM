@@ -328,13 +328,26 @@ games               & 0.00210      \\
 
 \vspace{2 mm}
 
-\noindent The features that were statistically significant at the highest threshold were $ncaa-appearances$ and $ff-appearances$, which intuitively make sense and in fact are used in the construction of the CoachRank graphical model. Additionally, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there currently exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and takes the largest step in the direction of the most correlated variable with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features that are the most "important" in determining the CoachRank values. The plot is shown below:
+\noindent Although not as important, this model resulted in an adjusted $R^2$ of 0.892, which implies that the set of features fit the CoachRank values quite well. More importantly, the features that were statistically significant at the highest threshold were $ncaa-appearances$ and $ff-appearances$, which intuitively make sense and in fact are used in the construction of the CoachRank graphical model. Additionally, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there currently exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and takes the largest step in the direction of the most correlated variable with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features that are the most "important" in determining the CoachRank values. The plot is shown below:
 
 \begin{figure}[H]
       \caption{LARS of Basketball Features}
       \centering
-      \includegraphics[width=1.0\textwidth]{bball_lars.png}
+      \includegraphics[width=1.0\textwidth]{fixedplot.png}
 \end{figure}
+
+\begin{center}
+\begin{tabular}{ | c | c |}
+\hline
+Features            & Label \\\hline
+conf\_reg\_wins      & 1      \\\hline
+conf\_tourn\_wins     & 2     \\\hline
+ff\_appearances      &  3    \\\hline
+ncaa\_appearances    & 4      \\\hline
+games               & 5      \\
+\hline
+\end{tabular}
+\end{center}
 
 \noindent As expected, the $ncaa-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so we were able to use the code although it's not publicly released yet.
 
