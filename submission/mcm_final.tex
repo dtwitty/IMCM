@@ -1,4 +1,4 @@
-\documentclass[titlepage,11pt]{article}
+\documentclass[11pt,notitlepage]{article}
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage{fullpage}
 \usepackage{graphicx}
@@ -9,15 +9,34 @@
 \newcommand*\Let[2]{\State #1 $\gets$ #2}
 \usepackage{float}
 \usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
 
 \newtheorem{theorem}{Theorem}[section]
 
 
 \begin{document}
-\title{CoachRank}
-\author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
+
+\pagestyle{fancyplain}
+\fancyhf{}
+\fancyhf[HLE,HRO]{Page \thepage\ of \pageref{LastPage}}
+\fancyhf[HRE,HLO]{Control Number 31406}
+\setlength{\headsep}{0.2in} 
+
+\title{College Coaching Legends}
+\author{Control Number 31406}
 \maketitle
 
+\begin{abstract}
+  In this paper, we employ mathematical models, specifically a combination of graphical and machine learning models, to find the 
+"best all time male college coach" in the last century for basketball, football, and baseball. Since "best" is ambiguous, we employ a more
+ qualitative approach to assessing our models' ranked coach lists through a combination of popular polls and Wikipedia. We start with using linear and nonlinear transformations of simple metrics such as wins, losses, games, but move on to create a graphical approach that is better able to model the interactions between coaches which we call CoachRank. Due to the complicated nature of the graphical model, we seek to understand what the most important
+attributes are that CoachRank uses to find the "best coach". We do so through a supervised learning approach to construct interpretable models
+that sports fans can better understand, and generalize a model that works for across time periods and genders. We find that CoachRank's "best" 
+coaches list is remarkably in line with top polls and intuitively make sense, and the supervised machine learning models extract championship appearances and win ratio as statistically significant attributes after removing heavily correlated attributes. Lastly, we partition the last century into different buckets and test both CoachRank and the machine learning model to find that CoachRank performs just as well while the machine learning model extracts out a smaller set of statistically significant attributes which may mean as the game evolved over time, people's notions of "best coach" has also evolved leading to a larger set of features now than a hundred years ago.
+\end{abstract}
+
+\pagebreak
 
 \tableofcontents
 
@@ -240,7 +259,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in championship game, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is a combination of the two factors: the importance of the game and the score difference.
 
 \subsubsection*{Parameter Estimation}
-\noindent $h:$ we let $h = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. Say for example that a team  playes 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in college Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
+\noindent $h:$ we let $h = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. Say for example that a team  plays 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in college Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
 \\
 
 \noindent Let $\beta:$ be the inverse of the median of score differences of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = \frac{1}{9}$, $\beta_{football} = \frac{1}{10}$. We do not use the mean because there are outliers in the score difference distribution, as we can see in the following graph:
@@ -271,10 +290,10 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 
 \subsubsection*{Feature Correlation}
 
-\noindent Before we start to use machine learning methods, it's important to get a feel for the data to make sure the models we produce are intuitively sound. After the initial data munging phase, we realized that a lot of the attributes (now on refered to as features) were correlated, which made sense because our data sets had wins, losses, total games played, etc. To make it the most interpretable and simplest model, we removed features that had a high degree of correlation. Below is the Pearson correlation matrix for basketball: 
+\noindent Before we start to use machine learning methods, it's important to get a feel for the data to make sure the models we produce are intuitively sound. After the initial data munging phase, we realized that a lot of the attributes (now on referred to as features) were correlated, which made sense because our data sets had wins, losses, total games played, etc. To make it the most interpretable and simplest model, we removed features that had a high degree of correlation. Below is the Pearson correlation matrix for basketball: 
 
 \begin{figure}[H]
-      \caption{Pearson Correlation matrix for basketabll features}
+      \caption{Pearson Correlation matrix for basketball features}
       \centering
       \includegraphics[width=0.55\textwidth]{bball_cor.png}
 \end{figure}
@@ -289,7 +308,7 @@ Multiple Linear Regression is a supervised machine learning method that predicts
 $E[CoachRankValue|X] = \gamma + \sum_{i=0}^{n} X_{i}$
 \end{center}
 
-\noindent That is, we are finding the conditional expectation of the CoachRank value of a coach given a set of features $X$. Since we would not only like to predict CoachRank values for coaches but also individually analyze the features, we handled multicollinearity by using the Pearson correlation matrix above to ensure none of the features were correlated above a minimum threshold of $0.9$. We also looked at the distribution of the features to make sure the homoscedasticity, weak exogeneity, and independence assumptions of linear regression held true. Once we performed the analysis, we observed the plots of the residuals to ensure that they were in fact normally distributed as that's another major assumption of regerssion. Below are the results of the multiple linear regression model:
+\noindent That is, we are finding the conditional expectation of the CoachRank value of a coach given a set of features $X$. Since we would not only like to predict CoachRank values for coaches but also individually analyze the features, we handled multicollinearity by using the Pearson correlation matrix above to ensure none of the features were correlated above a minimum threshold of $0.9$. We also looked at the distribution of the features to make sure the homoscedasticity, weak exogeneity, and independence assumptions of linear regression held true. Once we performed the analysis, we observed the plots of the residuals to ensure that they were in fact normally distributed as that's another major assumption of regression. Below are the results of the multiple linear regression model:
 
 \begin{center}
 \begin{tabular}{ | c | c |}
@@ -314,7 +333,7 @@ games               & 0.00210      \\
       \includegraphics[width=1.0\textwidth]{bball_lars.png}
 \end{figure}
 
-\noindent As expected, the $ncaa-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so are able to use the code although it's not publicly released yet.
+\noindent As expected, the $ncaa-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so we were able to use the code although it's not publicly released yet.
 
 \subsubsection*{Supersparse Linear Integer Model}
 
