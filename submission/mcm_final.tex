@@ -276,7 +276,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \begin{figure}[H]
       \caption{Pearson Correlation matrix for basketabll features}
       \centering
-      \includegraphics[width=1.0\textwidth]{basketball_cor.jpg}
+      \includegraphics[width=0.75\textwidth]{bball_cor.png}
 \end{figure}
 
 \noindent From the matrix above, we can clearly see that there are some attributes (wins, losses, games, etc.) that are colored dark blue, which we removed moving forward to create a compact set of features that explained what constituted as the "best coach" without redundancy. There are a wealth of supervised machine learning methods that we can use, but we have two defined goals: figure out what features make up the best coach and assess how well the graphical model works. To best achieve these goals, we decided to use multiple linear regression to figure out how each feature correlates with the coach's CoachRank value. This is also easy to explain to sports fans.
@@ -289,18 +289,29 @@ Multiple Linear Regression is a supervised machine learning method that predicts
 $E[CoachRankValue|X] = \gamma + \sum_{i=0}^{n} X_{i}$
 \end{center}
 
-\noindent That is, we are finding the conditional expectation of the CoachRank value of a coach given a set of features $X$. Since we would not only like to predict CoachRank values for coaches but also individually analyze the features, we handled multicollinearity by using the Pearson correlation matrix above to ensure none of the features were correlated above a minimum threshold of $0.8$. We also looked at the distribution of the features to make sure the homoscedasticity, weak exogeneity, and independence assumptions of linear regression held true. Below are the results of the multiple linear regression model:
+\noindent That is, we are finding the conditional expectation of the CoachRank value of a coach given a set of features $X$. Since we would not only like to predict CoachRank values for coaches but also individually analyze the features, we handled multicollinearity by using the Pearson correlation matrix above to ensure none of the features were correlated above a minimum threshold of $0.9$. We also looked at the distribution of the features to make sure the homoscedasticity, weak exogeneity, and independence assumptions of linear regression held true. Once we performed the analysis, we observed the plots of the residuals to ensure that they were in fact normally distributed as that's another major assumption of regerssion. Below are the results of the multiple linear regression model:
 
-[insert data shit]
+\begin{center}
+\begin{tabular}{ | c | c |}
+\hline
+Features            & Coefficients \\\hline
+conf\_reg\_wins       & -0.02572      \\\hline
+conf\_tourn\_wins     & 0.24730     \\\hline
+ff\_appearances      &  1.47954    \\\hline
+ncaa\_appearances    & 0.24730      \\\hline
+games               & 0.00210      \\
+\hline
+\end{tabular}
+\end{center}
 
 \vspace{2 mm}
 
-\noindent We notice that the features that are the most signficicant are $ncaa-appearances$ and $ff-appearances$, which intuitively make sense and are used in the construction of the CoachRank graphical model. Additionally, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there currently exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and takes the largest step in the direction of the most correlated variable with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features that are the most "important" in determining the CoachRank values. The plot is shown below:
+\noindent The features that were statistically significant at the highest threshold were $ncaa-appearances$ and $ff-appearances$, which intuitively make sense and in fact are used in the construction of the CoachRank graphical model. Additionally, the sign of the features make sense as the more final four and NCAA appearances a coach has the more popular or "good" they are likely to be. What's not intuitive is the real-valued coefficients of the features, and the number of features that we have: does one feature "predict" the CoachRank value of the coach better than other features? That is commonly referred to as variable selection, where there currently exist a wealth of methods. We use least-angle regression (LARS) for computing which features best correlate with the CoachRank. In a nutshell, LARS intializes all the coefficients of the features at zero and takes the largest step in the direction of the most correlated variable with CoachRank, until some other feature is more correlated, at which point LARS proceeds in a equiangular direction to both features, hence the name "least-angle". At the end of the day, LARS provides us which features that are the most "important" in determining the CoachRank values. The plot is shown below:
 
 \begin{figure}[H]
       \caption{LARS of Basketball Features}
       \centering
-      \includegraphics[width=1.0\textwidth]{basketball_lars.jpg}
+      \includegraphics[width=1.0\textwidth]{bball_lars.png}
 \end{figure}
 
 \noindent As expected, the $ncaa-appearances$ and $ff-appearances$ enter first and are thus deemed to be the most "important". Now it remains to figure out how to make the coefficients of the features more interpretable in a way that sports fans can understand it. Fortunately, intereptable models in supervised learning are a growing area of research within predictive modeling and machine learning. In the next section we discuss a natural extension to the multiple linear regression model discussed above known as Supersparse Linear Integer Models, which one of the group members is currently working on with Professor Cynthia Rudin at MIT, so are able to use the code although it's not publicly released yet.
@@ -309,24 +320,14 @@ $E[CoachRankValue|X] = \gamma + \sum_{i=0}^{n} X_{i}$
 
 Supersparse Linear Integer Models (SLIM) create predictive scoring systems that are both practical and interpretable. They are widely refered to as intrepretable models because they require users to perform only a few operations to make a prediction. They further restrict the coefficients to a certain set of integral values so that we can better understand the effect of the features on the predicted value. SLIM is formulated as a mixed integer program with an objective function that minimizes 0-1 training loss and $L_0$ and $L_1$ norm to ensure both accuracy, sparsity, and interpretability respectively. Although this is a computationally hard problem (NP-Hard), due the size of our data set and CPLEX solver from IBM we are able to obtain results within a reasonable amount of time. Additionally, as this is a classification model, we had to have a surjective mapping of our real valued CoachRank values to discrete buckets ($<0.01$, $>0.02$, etc). Since we had a imbalanced data set that resulted, that is the number of coaches falling into each bucket varied widely, we used the imbalanced formulation of SLIM. After doing so, we obtained results that, as expected, are close to the results of our multiple linear regression model but now have integral values for the features.        
 
-[PUT DATA IN SWDA]
+\subsubsection*{Can we abstract this?}
 
-\begin{center}
-\begin{tabular}{ | c | c |}
-\hline
-Features         & Coefficients \\\hline
-Adolph Rupp      &      \\\hline
-John Wooden      &      \\\hline
-Roy Williams     &      \\\hline
-Jerry Tarkania   &      \\\hline
-Dean Smith       &      \\
-\hline
-\end{tabular}
-\end{center}
+\noindent Okay, so we have these neat supervised machine learning methods that complement the complicated graphical CoachRank algorithm that we discussed earlier- so what? Well, the purpose of the machine learning methods was two fold: one to extract features from the CoachRank graphical model to actually determine how it's figuring out which coaches are the "best" and two to understand how these features interact with each other and affect the CoachRank value in a practical and interpretable way, both of which were done through the multiple linear regression model and supersparse linear integer model discussed above.  
 
-\subsubsection*{Tying it together}
+\vspace{2 mm}
 
-Okay, so we have these neat supervised machine learning methods that complement the complicated graphical CoachRank algorithm that we discussed earlier- so what? Well, the purpose of the machine learning methods was two fold: one to extract features from the CoachRank graphical model to actually determine how it's figuring out which coaches are the "best" and two to understand how these features interact with each other and affect the CoachRank value in a practical and interpretable way, both of which were done through the multiple linear regression model and supersparse linear integer model discussed above.
+\noindent A natural question that one may now ask is first how can we extend this trained machine learning models to other time periods and other genders. Well, a nice feature about both the graphical model and the supervised learning model is that they are specifically constructed for specific sports: sure, they might have inputs as "final four appearances" or "bowl games", but almost every sport has major competitions and team games that can be substituted for this. Additionally, not where in either model do we construct the model on any gender specific criteria, so our assumption is that these models above will hold for both genders \textit{assuming} both genders have similar abstract characteristics, which we believe at a first order approximation to be true. As far as different time periods go for the machine learning method, we partitioned the coaches into different data sets depending on their start year and found that the most significant extracted features were in fact largely the same, which is no surprise because there should not be a significant difference between the most important features that determine the best coach between different time periods. However, it is important to note we noticed in earlier time periods (1913-1940), there were less features that were found as statistically significant which might mean that the notion of "best" coach was more simplistic way back when but now has grown more complicated in determining what constitutes as the "best" coach as the game and society has evolved: an interesting observation.    
+
 
 \section{Results \& Validation}
 
