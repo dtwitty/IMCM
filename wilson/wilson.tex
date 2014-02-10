@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{algorithmicx, algorithm}
+\usepackage[noend]{algpseudocode}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\begin{document}
+
+\section{Non-Connected Model}
+We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score.
+
+The formula is
+\[ \mathrm{score} = 
+  \frac{1}{1 + \frac{1}{n} z^2}
+  \left(
+    \hat p + \frac{1}{2n} z^2 -
+    z \sqrt{
+      \frac{1}{n}\hat p \left(1 - \hat p\right) +
+      \frac{1}{4n^2}z^2
+    } 
+   \right)
+\]
+Where $n$ is the total number of games, $\hat{p}$ is the ratio of wins to total games, and $z$ is the $(1 - \alpha/2)$ quantile of the normal distribution.
+
+We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
+
+We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the small dataset size and high repute of the coaches in our Baseball dataset, we did not find filtering to be necessary.
+
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\begin{algorithm}[H]
+  \caption{Ranking Coaches by Wilson Score}
+  \begin{algorithmic}
+    \Require{A list of coaches $C$}
+    \Ensure{A sorted list of coaches $O$}
+	\Let{$C'$}{Coaches in $C$ meeting heuristic requirements}
+	\Let{$C''$}{Coaches in $C'$ with above-average scores in both win ratio and number of games}
+	\Let{$O$}{$C''$ sorted by lower bound of Wilson score confidence interval}
+  \end{algorithmic}
+\end{algorithm}
+\end{document}
