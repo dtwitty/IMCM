@@ -12,9 +12,9 @@
 \contentsline {subsubsection}{\numberline {3.2.2}Markov Chain (CoachRank)}{6}
 \contentsline {subsection}{\numberline {3.3}Machine Learning Model}{10}
 \contentsline {section}{\numberline {4}Results \& Validation}{14}
-\contentsline {subsection}{\numberline {4.1}Result of Graphical Model (CoachRank)}{14}
 \contentsline {section}{\numberline {5}Strengths and Weaknesses}{18}
 \contentsline {subsection}{\numberline {5.1}Strengths}{18}
 \contentsline {subsection}{\numberline {5.2}Weaknesses}{18}
-\contentsline {section}{\numberline {6}Conclusions and Future Work}{18}
-\contentsline {section}{\numberline {7}Bibliography}{20}
+\contentsline {section}{\numberline {6}Conclusions}{18}
+\contentsline {section}{\numberline {7}Future Work}{19}
+\contentsline {section}{\numberline {8}Bibliography}{20}
