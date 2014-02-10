@@ -4,6 +4,7 @@
 
 \title{College Coaching Legends}
 \date{}
+
 \maketitle
 \vspace{-10ex}
 Any sports ranking is going to be contentious. Players, coaches, and teams are often judged subjectively, not so much by how many games they win so much as how inspiring their story is. When we were given the challenge of deciding the greatest college coaches of all time, we knew that we'd have to be as objective as possible. Rather than choose any one way of picking the greatest coaches, we started with simple models and then extended to models that captured win-loss records between coaches, which we then compared to existing opinion polls and awards.
@@ -37,7 +38,7 @@ Rank & Football & Basketball & Baseball\\\hline
 \section{Best Coach Attributes}
 Okay cool, so we have this model that spits out the top 5 coaches for a sport by looking at interactions between the coaches. Wouldn't it be interesting to find out what attributes of a coach made them show up in the top 5? It's really difficult to tell this from the graphical model because there's a lot of thousands of coach interactions going on. So to combat this, we took the CoachRank values that the graph model spit out for each coach and tried to put a line through the points based on attributes we thought might be important, such as when they started coaching, how many games they won, how many times they ended up winning the championship, etc. Once we ran our new model, we found that the attributes that gave the coach a high rank were number of times they appeared in the final round of a sport and how many games they had won. This also confirmed our graph model because although we didn't explicitly use those attributes in making the model, they still showed up as indicators of a good coach. 
 
-We believe these models have a minimum amount of subjectivity, which sets them apart from many other rankings and opinion polls. These models make the best use of the data available to us, but that doesn't mean they are infallible. The final say on who's the greatest coach can only truly be tested on the field, and we think me do well in capturing that.
+We believe these models have a minimum amount of subjectivity, which sets them apart from many other rankings and opinion polls. These models make the best use of the data available to us, but that doesn't mean they are infallible. The final say on who's the greatest coach can only truly be tested on the field, and we think we do well in capturing that.
 
 
 \end{document}
