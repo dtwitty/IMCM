@@ -1,46 +1,16 @@
 \documentclass[titlepage]{article}
-\usepackage{amsfonts}
-\usepackage{bbm}
-\usepackage{graphicx}
-\renewcommand{\baselinestretch}{1}
-\usepackage[utf8]{inputenc}
-\usepackage{color}
-\usepackage[T1]{fontenc}
-\usepackage{geometry}
-\usepackage{amsmath}
-\usepackage{enumerate}
-\usepackage{caption}
-\usepackage{graphicx}
-\usepackage{subcaption}
-\usepackage{array}
+\usepackage{amsmath, amsthm, amssymb}
 \usepackage{fullpage}
-\usepackage{algorithm2e}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithmicx, algorithm}
+\usepackage[noend]{algpseudocode}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
 \usepackage{float}
-\usepackage{listings}
 \usepackage{tikz}
-\usepackage{amssymb}
 
-\everymath{\displaystyle}
 \newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{corollary}[theorem]{Corollary}
-
-\newcommand{\argmin}{\operatornamewithlimits{argmin}}
-
-\newenvironment{proof}[1][Proof]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-\newenvironment{definition}[1][Definition]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-\newenvironment{example}[1][Example]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-\newenvironment{remark}[1][Remark]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-
-\newcommand{\qed}{\nobreak \ifvmode \relax \else
-      \ifdim\lastskip<1.5em \hskip-\lastskip
-      \hskip1.5em plus0em minus0.5em \fi \nobreak
-      \vrule height0.75em width0.5em depth0.25em\fi}
 
 
 \begin{document}
@@ -51,174 +21,106 @@
 
 \tableofcontents
 
-\section{The Problem}
-Sports Illustrated, a magazine for sports enthusiasts, is looking for the “best all time college coach” male or female for the previous century. We now need to build a mathematical model to choose the best college coach or coaches (past or present) from among either male or female coaches in such sports as college hockey or field hockey, football, baseball or softball, basketball, or soccer. We need to take into consideration the time horizon, discuss how our model can be applied in general across both genders and all possible sports, and finally present our model’s top 5 coaches in each of 3 different sports.
+\section{Introduction}
+Sports Illustrated, a magazine for sports enthusiasts, asks, "Who are the greatest college coaches, male or female, of the last century?" To answer this, we constructed a mathematical model to choose the top coaches in men's Basketball, men's Football, and men's Baseball. We also use these models to consider the difference between coaching in the past and in the present. Finally, we present an article for Sports Illustrated detailing our metrics and results at a non-technical level.
 
 \section{Model Assumptions}
-\begin{enumerate}
+We make several assumptions in our modeling process:
+\begin{itemize}
 \item The idea of "best all time college coach" is subjective in nature, and to assess our model we have to focus more on qualitative assessment and justification, instead of a quantitative measure.
 
-\item A coach's rank is determined and only determined by his or her achievement in the sport he or she coaches in, and unrelated to other factors in his personal life.
+\item A coach's rank is determined and only determined by their achievement in the sport they coach, and is unrelated to other factors in their personal life.
 
-\end{enumerate}
-
+\item A coach is considered disjoint from his team. That is, we assume that no coach is unfairly supported by a good team nor unfairly limited by a bad team.
+\end{itemize}
 
 \section{Data Collection}
 The accuracy and relevance of our results depended heavily on the quality and volume of data we could collect. That said, data collection was perhaps the most difficult part of our modeling process. We found that data on college sports is much harder to come by than data on professional sports. Within the scope of our search, less popular sports like Hockey simply did not have easily accessible data, especially from before 2001. We often found that when a site stated they had statistics on file, this meant that they had scanned copies of the original documents, which we could not parse.
-\\
 
-\noindent For data that was available, we had to write web scrapers to collect the human-readable data. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
-\\
+For what was available, we had to write web scrapers to collect the data in its human-readable format. This made collecting data on the largest scales time-prohibitive, even with generous caching and multithreading. Finally, we had to be mindful of the data use policies of our sources, and ensure that our collection methods used as little bandwidth as possible.
 
-\noindent We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
-\\
+We managed to collect a fair amount of data for Football and Basketball, the most popular college sports. All the data for these two sports was taken from Sports-Reference. \textbf{CITE!}. For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 
-\noindent We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
-\\
+We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 
-\noindent Finding data for a Baseball was extremely difficult. We were only able to collect career statistics from less than 100 coaches, each with over 1000 wins. That data came from a Wikipedia article, which was backed by the NCAA's coaching records. We did not have the ability to parse the data from the original source, as it was in PDF format. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
-
+Finding data for a Baseball was extremely difficult. We were only able to collect career statistics for about 100 coaches, each with over 1000 wins. That data was backed by a NCAA PDF that was presumably human-entered. We did not have the ability to parse the data from the original source, else we would have collected data on every coach. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
 
 \section{Models}
 
 \subsection{Simple Win \& Loss Models}
 
-We would like to start with the simplest model as our baseline, and decide where and how we can improve.
-\\
+We began with the simplest models and improved with time. Naively, the most indicative measure of a coach's capability is the number of games won and the number of games lost, and this information is also easy to obtain. Therefore we started by considering different algorithms to rank coaches based only on their number of wins and losses.
 
-\noindent The most indicative measure of a coach's capability is the number of games she has won and the number of games she has lost, and this information is also easy to obtain. Therefore we start by considering different algorithms to rank coaches based on their number of wins and number of loss.
-
-\subsubsection{Sort by Win Percentage}
-The simplest model is to compute the win percentage. Let $V = \{v_1, ... v_n\}$ denotes the set of coaches, $w(v_i)$ returns the number of games $v_i$ has won and $l(v_i)$ returns the number of games $v_i$ has lost. This model can be represented with the function $r_1: V \rightarrow \mathbb{R}$:
-
-$$r_1(v_i) = \frac{w(v_i)}{l(v_i) + w(v_i)}$$
-\\
-
-\noindent This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach who has only played 4 games and won 3 of them doesn't not mean she is better than a coach who has played 100 games and won 70 of them, even though the first coach has better win percentage.
-\\
-
+\subsubsection{Sorting by Win Percentage}
+The simplest model involves computing the win percentage. That is, we score each coach by the ratio of wins to total games. This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach with a 4-1 win-loss record is intuitively not better than a coach with a 100-70 record, though this model would say so.
 
 \subsubsection{Sort by Net Wins}
-To take into account the number of games played, we can rank coaches by net wins, $r_2: V \rightarrow \mathbb{R}$:
-
-$$r_2(v_i) = w(v_i) - l(v_i)$$
-\\
-
-\noindent In this model, the more net wins you have, the higher you have, therefore combining both win-percentage and number of games played. Someone might ask: is a coach who has won 10 games and lost 10 games the same as a coach who has won 100 and lost 100?
+Another simple model involves computing net wins. That is, we score each coach by wins minus losses. Intuitively, this scales win-loss percentage with number of games played. However, this can be showed to simply favor coaches who have played more games. 
 
 \subsubsection{Sort by Squared Win \& Loss Ratio}
-Another model can be represented with the function $r_3: V \rightarrow \mathbb{R}$:
+A third simple model involves multiplying the win ratio by the number of wins. This model would appear more robust than the previous two models.
 
-$$r_3(v_i) = w(v_i)\frac{w(v_i)}{l(v_i) + w(v_i)}$$
-\\
+\subsection{Non-Connected Model}
+The problem with the previous three models presented is that they are arbitrary metrics. We apply subjective heuristics in an attempt to glean more ``correct'' results. We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score. Intuitively, this gives a better approximation of a coach's innate winning potential.
 
-\noindent One can then object, this model, as well as the previous one, will clearly have a bias towards coaches who have coached longer, since an increase in by $w(v_i)$ will have a larger effect than a higher win percentage.
-\\
+The formula is
+\[ \mathrm{score} = 
+  \frac{1}{1 + \frac{1}{n} z^2}
+  \left(
+    \hat p + \frac{1}{2n} z^2 -
+    z \sqrt{
+      \frac{1}{n}\hat p \left(1 - \hat p\right) +
+      \frac{1}{4n^2}z^2
+    } 
+   \right)
+\]
+Where $n$ is the total number of games, $\hat{p}$ is the ratio of wins to total games, and $z$ is the $(1 - \alpha/2)$ quantile of the normal distribution. Our model uses 95\% confidence.
 
-\noindent The three models above all share the same fundamental flaw: they are both arbitrary and subjective. We are simply picking some heuristics and choose among them the one that we think make the most sense, when we see a problem, we adjust the formula to compensate for it. But we whink we can do better:
+We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
 
-\subsection{Non-connected Model}
+We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the small dataset size and high repute of the coaches in our Baseball dataset, we did not find filtering to be necessary.
 
-We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score.
-\\
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\begin{algorithm}[H]
+  \caption{Ranking Coaches by Wilson Score}
+  \begin{algorithmic}
+    \Require{A list of coaches $C$}
+    \Ensure{A sorted list of coaches $O$}
+	\Let{$C'$}{Coaches in $C$ meeting heuristic requirements}
+	\Let{$C''$}{Coaches in $C'$ with above-average scores in both win ratio and number of games}
+	\Let{$O$}{$C''$ sorted by lower bound of Wilson score confidence interval}
+  \end{algorithmic}
+\end{algorithm}
 
-\noindent We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
-\\
-
-\noindent We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win.
-\\
-
-\noindent The strengths of this model include 
+\noindent The strengths of this model include:
 \begin{itemize}
-\item Easy to understand and implement
-\item Works on the most easily accessible data (career totals)
-\item Does not rely on tuned parameters
+\item It is easy to understand and implement
+\item It works on the most easily accessible data (career totals)
+\item It does not rely on tuned parameters
 \end{itemize}
 
-\noindent The weaknesses of this model include
+\noindent The weaknesses of this model include:
 \begin{itemize}
-\item Does not use connectivity data between coaches
+\item It does not consider much data, just two variables for each coach.
 \item Relies on ad-hoc heuristics to remove outliers
 \end{itemize}
 
-\noindent However, we can still do better by incorporating more data into our model.
-
 \subsection{Graphical Model}
-It comes very natural for us to consider the problem as a graph. The nodes of the graph are the coaches. An edge between two nodes denotes the relation between two coaches, such as the game result of them playing against each other.
-\\
+We had access to more data than career win and loss totals, and we incorporated connectivity data between coaches into a graph-based model. One can consider the nodes of the graph to be the coaches and the edges to represent relationships between pairs of coaches. Naturally, the edges between coaches in our graphs are based on games played between them. Depending on the situation, the edges could be weighted and directed either from or towards the better coach.
 
-\noindent This idea of representing the problem as a graph is a very good step forward because it allow us to go beyond the simple statistics like win/loss ratio of a single coach, and gain more insight from the data.
-\\
-
-\noindent Another advantage of this model is that it can aggregate data from different time periods. For example if coach A beats coach B and then retired in 1990, and coach B beat coach C later in 1995, then in the graph we will have a way to compare coach A and coach C because there is a path from A to C through B, even though they never played against each other.
+The main advantage of a graph-based approach is that it can observe direct interactions between pairs of coaches. It also allows us to apply transitivity to our data. That is, the relationship between two coaches can now be influenced by the pair's interactions with outside coaches. The approach even allows inferences about coach pairs who never played against each other.
 
 \subsubsection{Topological Ordering}
-A very first idea that comes to mind is Topological Ordering. In this sub-model, there exist an edge from $i$ to $j$ if and only if among all the games $i$ played against $j$, $j$ beat $i$ more often than $i$ beat $j$ (net-loss). Then if there exists a Topological Ordering of the graph, we have a ranking of the coaches based on their rival history.
-\\
+The first idea that came to mind was to apply a topological ordering to the graph. That is, if we consider edges between pairs to point to the better coach, we want to remove coaches from the graph such that at time of removal, that coach has no incoming edges (and is therefore the worst coach). The idea is that the coaches removed last would be the best.
 
-\noindent Consider the following example. Coach 1 has been beaten by both 2 and 3, coach 2 has been beaten by coach 3 and 4, coach 3 has been beaten by coach 4, and coach 4 is never beaten by anyone. We have a topological ordering in the graph: $\{1, 2, 3, 4\}$, and it is natural to conclude that coach 4 is the best coach among them. (For now, when we talk A is beaten by B, we mean net-loss, which means A is beaten by B more often than B is beaten by A. We will introduce more sophisticated measures later).
+The major problem with this approach has to do with cycles. In order to construct a topological sort, we would either need a graph with no cycles (implying an already-existing partial order on coaches), or a mechanism for removing cycles from the graph. We could not create a satisfactory heuristic for removing cycles (that is, one that didn't seem too arbitrary).
 
-\begin{center}
-\begin{tikzpicture}[scale=0.2]
-\tikzstyle{every node}+=[inner sep=0pt]
-\draw [black] (16.1,-27.9) circle (3);
-\draw (16.1,-27.9) node {$1$};
-\draw [black] (30.2,-27.9) circle (3);
-\draw (30.2,-27.9) node {$2$};
-\draw [black] (44.7,-27.9) circle (3);
-\draw (44.7,-27.9) node {$3$};
-\draw [black] (59.2,-27.9) circle (3);
-\draw (59.2,-27.9) node {$4$};
-\draw [black] (19.1,-27.9) -- (27.2,-27.9);
-\fill [black] (27.2,-27.9) -- (26.4,-27.4) -- (26.4,-28.4);
-\draw [black] (33.2,-27.9) -- (41.7,-27.9);
-\fill [black] (41.7,-27.9) -- (40.9,-27.4) -- (40.9,-28.4);
-\draw [black] (47.7,-27.9) -- (56.2,-27.9);
-\fill [black] (56.2,-27.9) -- (55.4,-27.4) -- (55.4,-28.4);
-\draw [black] (17.843,-25.463) arc (139.24738:40.75262:16.577);
-\fill [black] (42.96,-25.46) -- (42.81,-24.53) -- (42.06,-25.18);
-\draw [black] (57.453,-30.334) arc (-40.77401:-139.22599:16.84);
-\fill [black] (57.45,-30.33) -- (56.55,-30.61) -- (57.31,-31.27);
-\end{tikzpicture}
-\end{center}
 
-\noindent However, one natural limitation of this model is the following theorem:
-
-\begin{theorem}
-A graph $G$ has a topological ordering if and only if it is a DAG (directed acyclic graph).
-\end{theorem}
-\begin{proof}
-See Section 3.6 of Algorithms Design by Kleinberg and Tardos.
-\end{proof}
-
-\noindent To solve this issue, we think of two algorithms. One is to reduce the originial graph into a DAG: keep removing the most "unimportant" edges untils the graph is acyclic. By most "unimportant" we then have to find a way to measure the importance of an edge. In this model, the weight (or importance) an edge by the net-loss it is associated with:
-
-$$w(e_{i, j}) = \mbox{number of times j beats i} - \mbox{number of times j beats i}$$
-
-\noindent The algorithm then works as following:
-
-\vspace{5mm}
-
-\begin{algorithm}[H]
-
-\While{$G$ is not DAG}{
-$e_{min} = \argmin_{e \in E} w(e)$\;
-Remove $e_min$ from $G$
-}
-
-\end{algorithm}
-
-\vspace{5mm}
-
-\noindent However, this algorithm has apparent flaws: suppose even though coach A and coach B only encounter each other once, however it is in the SuperBowl, while the matchup between coach A and coach C is quite often but only in friendly games or early-season games and therefore the result is less important and less indicative of their comparative abilities. Therefore using the net-loss as the only measurement of the importance of an edge can possibly remove the important edge and keep the unimportant ones. We can of course tweak the edge-weight by introducing the importance of a game, the time in both coaches' career when the match happens, etc., but simply adding heuristics seem not like the best approach to the problem.
-\\
-
-\noindent The second algorithm requires a certain "leap of faith" by introducing randomness into our model:
+% current commit ends here
 
 \subsubsection{Markov Chain (Voting Model)}
-
-To solve the problem of Topogical Ordering, instead of trying to create a DAG to fit the algorithm, we decide adjust the mechanism behind ranking using Topological Ordering.
-\\
 
 \noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which she can divide up into pieces. She can then give the chunks of the vote to different coaches which she think is definitely better coach than she is. We assume the coaches to be rational: she doesn't take into account the opinions of amateurs and public media, and only give out votes to the one she truly believe is better than her (one possible way is only give out vote to the coaches who has beaten her). Then we will rank the coaches based on how many votes each coach eventually get. However since the coaches form a graph and there even might be cycles in the game, so at each timestep a coach can be both receiving and giving. What we are interested in is the distribution of the votes at some large time.
 \\
@@ -320,14 +222,15 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 
 \vspace{5mm}
 
-\begin{algorithm}[H]
-
-$v = (1/n, ... ,1/n)$\;
-\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\|_2 < e^{-8}$}{
-$v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
-}
-\Return $v$\;
-\end{algorithm}
+%\begin{algorithm}[H]
+%\begin{algorithmic}
+%$v = (1/n, ... ,1/n)$\;
+%\While{$\| \alpha v {\bf P} + (1 - \alpha)(1, ... ,1) - v\|_2 < e^{-8}$}
+%\State{$v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$}
+%\EndWhile
+%\Return{$v$}
+%\end{algorithmic}
+%\end{algorithm}
 
 \vspace{5mm}
 
