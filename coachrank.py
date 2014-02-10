@@ -4,8 +4,8 @@ import re
 import math
 
 
-start_year = 1950
-end_year = 2000
+start_year = 1800
+end_year = 2100
 
 def parse_tuple(s):
 	match = re.match(r"\('(.*)', (.*), '(.*)', (.*)\)", s)
@@ -28,14 +28,14 @@ class Coachrank():
 		self.G = nx.DiGraph()
 
 
-		yf = open("football_start_year.csv", "r")
+		yf = open("basketball_start_year.csv", "r")
 		yf.readline()
 		for line in yf:
 			_, k, v = line.replace("\n", "").replace("\"", "").split(" ")
 			self.year_map[k] = int(v)
 		yf.close()
 
-		f = open("football_games.txt", 'r')
+		f = open("basketball_playoff_games.txt", 'r')
 		for line in f:
 			winner, winning_score, loser, losing_score = parse_tuple(line)
 			if winner not in self.coach_map:
@@ -81,7 +81,7 @@ class Coachrank():
 	def coach_rank(self, top_k):
 		result = alg.pagerank(self.G, alpha=0.95)
 		result_arr = sorted((result[k], k) for k in result.keys())[::-1]
-		# self.write_result(result_arr)
+		self.write_result(result_arr)
 		result_arr = result_arr[:top_k]
 		
 		for v, k in result_arr:
@@ -96,10 +96,12 @@ class Coachrank():
 			print self.reverse_map[k], k, v, s1 - s2
 
 	def write_result(self, arr):
-		f = open("wenhai_football_result.csv", "w")
+		f = open("wenhai_basketball_result.csv", "w")
+		i = 1
 		for k, v in arr:
 			if self.reverse_map[v] in self.year_map:
-				f.write("%s,%d,%f\n" % (self.reverse_map[v], self.year_map[self.reverse_map[v]], k))
+				f.write("%d,%s,%d,%f\n" % (i, self.reverse_map[v], self.year_map[self.reverse_map[v]], k))
+				i += 1
 		f.close()
 
 Coachrank()

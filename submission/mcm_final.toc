@@ -6,8 +6,8 @@
 \contentsline {subsection}{\numberline {3.1}Simple Win \& Loss Models}{3}
 \contentsline {subsubsection}{\numberline {3.1.1}Sort by Win Percentage}{3}
 \contentsline {subsubsection}{\numberline {3.1.2}Sort by Net Wins}{3}
-\contentsline {subsubsection}{\numberline {3.1.3}Sort by Squared Win \& Loss Ratio}{3}
-\contentsline {subsection}{\numberline {3.2}Graphical Model}{3}
+\contentsline {subsubsection}{\numberline {3.1.3}Sort by Scaled Win Ratio}{3}
+\contentsline {subsection}{\numberline {3.2}Graphical Model}{4}
 \contentsline {subsubsection}{\numberline {3.2.1}Topological Ordering}{4}
 \contentsline {subsubsection}{\numberline {3.2.2}Markov Chain (CoachRank)}{4}
 \contentsline {subsection}{\numberline {3.3}Machine Learning Model}{8}
@@ -16,6 +16,5 @@
 \contentsline {section}{\numberline {5}Strengths and Weaknesses}{15}
 \contentsline {subsection}{\numberline {5.1}Strengths}{15}
 \contentsline {subsection}{\numberline {5.2}Weaknesses}{15}
-\contentsline {section}{\numberline {6}Conclusions}{15}
-\contentsline {section}{\numberline {7}Future work}{15}
-\contentsline {section}{\numberline {8}Bibliography}{17}
+\contentsline {section}{\numberline {6}Conclusions and Future Work}{15}
+\contentsline {section}{\numberline {7}Bibliography}{17}
