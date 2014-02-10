@@ -19,6 +19,7 @@ class Coachrank():
 
 	def build_graph(self):
 		self.coach_map = {}
+		self.year_map = {}
 		self.reverse_map = {}
 		self.G = nx.DiGraph()
 
@@ -55,6 +56,13 @@ class Coachrank():
 					self.G[loser_index][winner_index]['weight'] += add_weight
 				else:
 					self.G.add_edge(loser_index, winner_index, weight=add_weight)
+
+		yf = open("", "r")
+		for line in yf:
+			k, v = line.replace("\n", "").split(",")
+			self.year_map[k] = int(v)
+		yf.close()
+
 		print len(self.G.nodes())
 		print len(self.G.edges())
 		print(nx.number_weakly_connected_components(self.G))
@@ -79,7 +87,7 @@ class Coachrank():
 	def write_result(self, arr):
 		f = open("wenhai_basketball_result.csv", "w")
 		for k, v in arr:
-			f.write("%s,%f\n" % (self.reverse_map[v], k))
+			f.write("%s,%f,%d\n" % (self.reverse_map[v], k, self.year_map[self.reverse_map[v]]))
 		f.close()
 
 Coachrank()
