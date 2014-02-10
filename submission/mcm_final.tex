@@ -48,17 +48,18 @@
 \author{Akilesh Potti, Dominick Twitty, Wenhai Yang}
 \maketitle
 
-\begin{abstract}
-Todo
-\end{abstract}
 
+\tableofcontents
 
 \section{The Problem}
 Sports Illustrated, a magazine for sports enthusiasts, is looking for the “best all time college coach” male or female for the previous century. We now need to build a mathematical model to choose the best college coach or coaches (past or present) from among either male or female coaches in such sports as college hockey or field hockey, football, baseball or softball, basketball, or soccer. We need to take into consideration the time horizon, discuss how our model can be applied in general across both genders and all possible sports, and finally present our model’s top 5 coaches in each of 3 different sports.
 
 \section{Model Assumptions}
 \begin{enumerate}
-\item Todo
+\item The idea of "best all time college coach" is subjective in nature, and to assess our model we have to focus more on qualitative assessment and justification, instead of a quantitative measure.
+
+\item A coach's rank is determined and only determined by his or her achievement in the sport he or she coaches in, and unrelated to other factors in his personal life.
+
 \end{enumerate}
 
 
@@ -88,7 +89,7 @@ We would like to start with the simplest model as our baseline, and decide where
 \noindent The most indicative measure of a coach's capability is the number of games she has won and the number of games she has lost, and this information is also easy to obtain. Therefore we start by considering different algorithms to rank coaches based on their number of wins and number of loss.
 
 \subsubsection{Sort by Win Percentage}
-The simplest model is to compute the Win Percentage. Let $V = \{v_1, ... v_n\}$ denotes the set of coaches, $w(v_i)$ returns the number of games $v_i$ has won and $l(v_i)$ returns the number of games $v_i$ has lost. This model can be represented with the function $r_1: V \rightarrow \mathbb{R}$:
+The simplest model is to compute the win percentage. Let $V = \{v_1, ... v_n\}$ denotes the set of coaches, $w(v_i)$ returns the number of games $v_i$ has won and $l(v_i)$ returns the number of games $v_i$ has lost. This model can be represented with the function $r_1: V \rightarrow \mathbb{R}$:
 
 $$r_1(v_i) = \frac{w(v_i)}{l(v_i) + w(v_i)}$$
 \\
@@ -96,16 +97,35 @@ $$r_1(v_i) = \frac{w(v_i)}{l(v_i) + w(v_i)}$$
 \noindent This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach who has only played 4 games and won 3 of them doesn't not mean she is better than a coach who has played 100 games and won 70 of them, even though the first coach has better win percentage.
 \\
 
-\noindent This, however, is an easily broken heuristic. As one may see on some shopping or review sites, this heuristic will rate an item with a single 5-star review higher than an item with 400 4-star reviews. This is unacceptable when choosing from hundreds of coaches with a large spread in terms of number of games. 
+
+\subsubsection{Sort by Net Wins}
+To take into account the number of games played, we can rank coaches by net wins, $r_2: V \rightarrow \mathbb{R}$:
+
+$$r_2(v_i) = w(v_i) - l(v_i)$$
 \\
 
-\noindent We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score.
+\noindent In this model, the more net wins you have, the higher you have, therefore combining both win-percentage and number of games played. Someone might ask: is a coach who has won 10 games and lost 10 games the same as a coach who has won 100 and lost 100?
+
+\subsubsection{Sort by Squared Win \& Loss Ratio}
+Another model can be represented with the function $r_3: V \rightarrow \mathbb{R}$:
+
+$$r_3(v_i) = w(v_i)\frac{w(v_i)}{l(v_i) + w(v_i)}$$
+\\
+
+\noindent One can then object, this model, as well as the previous one, will clearly have a bias towards coaches who have coached longer, since an increase in by $w(v_i)$ will have a larger effect than a higher win percentage.
+\\
+
+\noindent The three models above all share the same fundamental flaw: they are both arbitrary and subjective. We are simply picking some heuristics and choose among them the one that we think make the most sense, when we see a problem, we adjust the formula to compensate for it. But we whink we can do better:
+
+\subsection{Non-connected Model}
+
+We instead consider a more sophisticated approach: the Wilson score confidence interval. For each coach, we consider the event that the coach will win when playing any other coach. The observed binomial proportion is the fraction of games the coach wins. Using the Wilson score, we can determine a confidence interval for the proportion of wins. We take the lower bound of this interval and use that as our coach score.
 \\
 
 \noindent We found that this model produced unsatisfactory result when comparing very weak coaches to very strong coaches. For example, it will favor a coach with a (15-1) record to one with a (876-190) record.
 \\
 
-\noindent We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win. Due to the l
+\noindent We found that inserting a filtering step dramatically improved results. For Basketball, we only considered coaches with at least one NCAA appearance and above-average win ratio and number of games. We filtered Football coaches similarly, except we only considered coaches with at least one bowl win.
 \\
 
 \noindent The strengths of this model include 
@@ -121,24 +141,7 @@ $$r_1(v_i) = \frac{w(v_i)}{l(v_i) + w(v_i)}$$
 \item Relies on ad-hoc heuristics to remove outliers
 \end{itemize}
 
-\subsubsection{Sort by Net Wins}
-To take into account the number of games played, we can rank coaches by net wins, $r_2: V \rightarrow \mathbb{R}$:
-
-$$r_2(v_i) = w(v_i) - l(v_i)$$
-\\
-
-\noindent In this model, the more net wins you have, the higher you have, therefore combining both win-percentage and number of games played. Someone might ask: is a coach who has won 100 games and lost 100 games the same as a coach who has won 100?
-
-\subsubsection{Sort by Squared Win \& Loss Ratio}
-Another model can be represented with the function $r_3: V \rightarrow \mathbb{R}$:
-
-$$r_3(v_i) = \frac{w(v_i)^2}{l(v_i) + w(v_i)}$$
-\\
-
-\noindent One can then object, this model, as well as the previous one, will clearly have a bias towards coaches who have coached longer, since an increase in by $w(v_i)$ will have a larger effect than a higher win percentage $\frac{w(v_i)}{w(v_i) + l(v_i)}$
-\\
-
-\noindent The three models above all share the same fundamental flaw: they are both arbitrary and subjective. We are simply picking some heuristics and choose among them the one that we think make the most sense, when we see a problem, we adjust the formula to compensate for it. But we whink we can do better, with the data and information we have:
+\noindent However, we can still do better by incorporating more data into our model.
 
 \subsection{Graphical Model}
 It comes very natural for us to consider the problem as a graph. The nodes of the graph are the coaches. An edge between two nodes denotes the relation between two coaches, such as the game result of them playing against each other.
@@ -312,6 +315,7 @@ $${\bf D} (i, j) = \alpha {\bf P} (i, j)  + (1-\alpha)\frac{1}{n}$$
 
 \subsubsection*{Efficient Implementation}
 
+
 Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly can be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use Power Method:
 
 \vspace{5mm}
@@ -329,7 +333,7 @@ $v = \alpha v {\bf P} + (1 - \alpha)(1, ... ,1)$\;
 
 \noindent Since $v {\bf P}$ can be calculated using sparse matrix ${\bf P}$, this algorithm is much more computationally efficient than simply calculating the eigenvectors of ${\bf D}$. As $\alpha$ increases, the time it takes for $v$ to converge is shorter, but the difference in the ranking might be less significant, therefore this is a tradeoff and we pick $\alpha = 0.95$.
 
-\subsubsection*{More on Edge Weights}
+\subsubsection*{Edge Weights}
 
 \noindent In the model we introduced above, in situation where $d(v_i) \geq 1$ (which is something we assume in the rest of this section), ${\bf P}(i, j) = \frac{ I\{(v_i, v_j) \in E\}}{d(v_i)}$, where $I\{(v_i, v_j) \in E\}$ is simply an indicator variable indicating whether i has a net-loss against j. However there are a lot more information we can capture, if we think more about the vote coach i will give:
 
@@ -397,60 +401,60 @@ However, for some type of sports, there are not usually data available for every
 
 \section{Results \& Validation}
 
-\subsection{Result of Simple Win \& Loss Models}
+In this section we are just giving the results of the top-5 coaches for 3 sports. The 3 sports we choose are Male College Basketball, Male College Football, and Male College Baseball. We will start with the result using the Non-connected Model.
 
-Since this will not be our final model, we will simply show the top 5 results of $r_1$, $r_2$, and $r_3$ for Male College Basketball, and due to time-constraint we only have the data for playoff games:
+\subsection{Result of Non-connected Model}
 
-\subsubsection*{Win Percentage}
+\subsubsection*{Male College Basketball}
 
 \begin{center}
-\begin{tabular}{ | c | c | c| }
+\begin{tabular}{ | c | c | c| c |}
 \hline
-Coach Name       & Wins  & Loss \\\hline
-Jack Friel       & 2     & 0 \\\hline
-Everett Dean     & 2     & 0 \\\hline
-Elmer Ripley     & 2     & 0 \\\hline
-Earl Brown       & 2     & 0 \\\hline
-Kenneth Loeffler & 8     & 0 \\
+Coach Name       & Wins  & Loss & Wilson Score \\\hline
+Adolph Rupp      & 876   & 190  & 0.8210 \\\hline
+John Wooden      & 664   & 162  & 0.8030 \\\hline
+Roy Williams     & 715   & 187  & 0.7918 \\\hline
+Jerry Tarkania   & 761   & 202  & 0.7894 \\\hline
+Dean Smith       & 879   & 254  & 0.7750 \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsubsection*{Net Wins}
+\subsubsection*{Male College Football}
 
 \begin{center}
-\begin{tabular}{ | c | c | c| }
+\begin{tabular}{ | c | c | c| c |}
 \hline
-Coach Name       & Wins   & Loss \\\hline
-Mike Krzyzewski  & 82     & 25 \\\hline
-Roy  Williams    & 62     & 21 \\\hline
-Dean Smith       & 63     & 25 \\\hline
-John Wooden      & 45     & 6 \\\hline
-Rick Pitino      & 48     & 15 \\
+Coach Name       & Wins  & Loss & Wilson Score \\\hline
+Tom Osborne      & 255   & 49   & 0.8374 \\\hline
+Bear Bryant      & 323   & 85   & 0.7904 \\\hline
+Bo Schembechler  & 234   & 65   & 0.7811 \\\hline
+Wallace Wade     & 171   & 49   & 0.7755 \\\hline
+Woody Hayes      & 205   & 61   & 0.7691 \\
 \hline
 \end{tabular}
 \end{center}
 
-\subsubsection*{Squared Win \& Loss Ratio}
+\subsubsection*{Male College Baseball}
 
 \begin{center}
-\begin{tabular}{ | c | c | c| }
+\begin{tabular}{ | c | c | c| c | }
 \hline
-Coach Name       & Wins   & Loss \\\hline
-Mike Krzyzewski  & 82     & 25 \\\hline
-Roy  Williams    & 62     & 21 \\\hline
-John Wooden      & 45     & 6 \\\hline
-Dean Smith       & 63     & 25 \\\hline
-Rick Pitino      & 48     & 15 \\
+Coach Name       & Wins   & Loss & Wilson Score \\\hline
+Ed Cheff         & 1705   & 430  & 0.7980 \\\hline
+Mike Martin      & 1771   & 611  & 0.7429 \\\hline
+Gene Stephenson  & 1837   & 675  & 0.7307 \\\hline
+Augie Garrido    & 1874   & 871  & 0.6821 \\\hline
+Gordie Gillespie & 1893   & 952  & 0.6648 \\
 \hline
 \end{tabular}
 \end{center}
 
-\noindent From the result we can clearly see win-percentage is clearly a bad-indicator since there are a lot of noise in the data where some coaches win all of the few games they played. Net-Wins and Squared Win Loss Ratio seem to do reasonably well by comparing the results to public polls and their achievement history.
+\noindent Since this model only takes into account a coach's career win and loss, the result will differ a lot from the graphical model, which capture more information:
 
 \subsection{Result of Graphical Model (Voting Model)}
 
-Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
+Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball (due to time-constraint, we were not able to find game data for College Male Baseball to form a graph):
 
 \subsubsection*{Male College Football}
 
@@ -518,22 +522,27 @@ Rick Pitino  & 0.02066 \\
 
 \noindent Varying parameters $\alpha$ from 0.75 to 0.95, and scaling $\beta$ upwards and downwards by $10\%$, the top 5 coaches returned doesn't have much difference, just with minor rank movement among the top 10 coaches. This is in part due to the quick drop-off rate of the curve above, and the large score differences between top coaches. Therefore, we conclude that the result of the graphical model is valid and it is robust to change in parameters.
 
-\subsubsection*{Comparison with Simple Models \& Justification}
-
 \section{Strengths and Weaknesses}
+
 \subsection{Strengths}
 \begin{itemize}
-\item Todo
+\item The graphical model allow us to be more objective in our ranking algorithm since we can understand it as the coaches voting among themselves based on their game history, instead of arbitrary tweaking of heuristics.
+
+\item We take into account not only the career data of a coach, but also the game result, game score, and the game importance of the games they play against each other.
+
+\item We have efficient implementation using power method to calculate the stationary distribution of the Markov Chain, and the results show clear differentiation between coaches, especially high-ranking ones.
 \end{itemize}
+
 \subsection{Weaknesses}
-Saying nothing about the weaknesses of our models themselves, our results are limited by the amount of data we could collect. Listed below are possible sources of fault.
-
 \begin{itemize}
-\item We could not consider coaches not in our dataset. For example, John Gagliardi, the coach with the most wins in college Football history, was not in our data set because he competed in the NAIA and NCAA Division III leagues. 
+\item Due to the limited amount of data we could collect, we could not consider coaches not in our dataset. For example, John Gagliardi, the coach with the most wins in college Football history, was not in our data set because he competed in the NAIA and NCAA Division III leagues. 
 
-\item Our graph models used only postseason games as input. We justify this heuristically by saying that only skilled coaches will be play in the postseason. However, this produces somewhat sparse graphs, especially compared to those we could have generated if we were able to collect data on every game.
+\item Our graphical models used only postseason games as input. We justify this heuristically by saying that only skilled coaches will be play in the postseason. However, this produces somewhat sparse graphs, especially compared to those we could have generated if we were able to collect data on every game.
 
 \item Our data for Baseball does not include any data concerning connections between coaches, therefore we could not use our graph model to choose the best baseball coach. Furthermore, we were unable to collect championship-specific data for Baseball coaches.
+
+\item Assessment is also difficult since ranking is in itself subjective. Our methods of assessment are limited to public polls online, professional sport media, coaches' achievements, and cross-validation between our different models.
+
 \end{itemize}
 
 \section{Conclusions}
@@ -541,7 +550,9 @@ Todo
 
 \section{Future work}
 \begin{itemize}
-\item Todo
+\item Obtain more game data and coach career information, and more information about the coaches to train a better model.
+
+\item Come up with an objective mechanism to assess the result of our ranking, such as incorporating more public sources.
 \end{itemize}
 
 \pagebreak
