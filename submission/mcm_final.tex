@@ -62,7 +62,7 @@ One of the key assumptions we make in our approach is that in general, "best" co
 
 We began with the simplest models and continually improved them. Naively, the most indicative measure of a coach's capability is the number of games won and the number of games lost, and this information is also easy to obtain. Therefore we started by considering different algorithms to rank coaches based only on their number of wins and losses.
 
-\subsubsection{Sorting by Win Percentage}
+\subsubsection{Sort by Win Percentage}
 The simplest model involves computing the win percentage. That is, we score each coach by the ratio of wins to total games. This method has obvious flaws: it doesn't take into account the number of games played by the coaches: a coach with a 4-1 win-loss record is intuitively not better than a coach with a 100-70 record, though this model would say so.
 
 \subsubsection{Sort by Net Wins}
@@ -238,7 +238,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in championship game, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is a combination of the two factors: the importance of the game and the score difference.
 
 \subsubsection*{Parameter Estimation}
-\noindent $f:$ we let $f = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. Say for example that a team  playes 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in college Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
+\noindent $h:$ we let $h = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. Say for example that a team  playes 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in college Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
 \\
 
 \noindent Let $\beta:$ be the inverse of the median of score differences of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = \frac{1}{9}$, $\beta_{football} = \frac{1}{10}$. We do not use the mean because there are outliers in the score difference distribution, as we can see in the following graph:
@@ -383,12 +383,12 @@ Gordie Gillespie & 0.01664 \\
 \end{tabular}
 \end{center}
 
-\noindent If we plot the Vote \% of all the coaches from high to low, we can get the following histogram for College Basketball. Similar graphs were computed for Baseball and Football.
+\noindent If we plot the Vote \% of all the College Basketball coaches from high to low, we can get the following histogram. Similar graphs were computed for Baseball and Football.
 
 \begin{figure}[H]
       \caption{Male College Basketball Vote \%}
       \centering
-      \includegraphics[width=1.1\textwidth]{graphs/basketball_score_dist.png}
+      \includegraphics[width=1\textwidth]{graphs/basketball_score_dist.png}
  \end{figure}
 
 \noindent We find some very interesting facts from this graph:
@@ -400,7 +400,19 @@ Gordie Gillespie & 0.01664 \\
 
 \subsubsection*{Comparison Across Time Horizon}
 
+If we plot the vote \% of all the College Basketball coaches over the start year of their careers, we can get the following histogram:
+
+\begin{figure}[H]
+      \caption{Vote \% Distribution over Career Start Year}
+      \centering
+      \includegraphics[width=1\textwidth]{graphs/time_horizon.png}
+ \end{figure}
+
+\noindent We can see from the graph that the scores of the coaches have a positive correlation with the start-year of their career. This is reasonbale because first techniques of sports tend to improve overtime and second due to the shortage of data for earlier periods we have more connectivity for coaches in later periods in the graphical model. In the graph If we run the graphical model in separate time periods.
+
 \subsubsection*{Applying the Model to Other Sports}
+
+Applying the graphical model to other sports are very straightforward. First obtain enough data of games played between coaches, the scores of the games, and the importance of the games. Then adjust $\beta$ and $h$ based on the median score difference and league structure. With this information we can run the graphical model and calculate vote \% for each coach and select the top 5 results as the "best college coaches of all time".
 
 \subsubsection*{Assessment}
 
