@@ -276,7 +276,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \begin{figure}[H]
       \caption{Pearson Correlation matrix for basketabll features}
       \centering
-      \includegraphics[width=0.75\textwidth]{bball_cor.png}
+      \includegraphics[width=0.55\textwidth]{bball_cor.png}
 \end{figure}
 
 \noindent From the matrix above, we can clearly see that there are some attributes (wins, losses, games, etc.) that are colored dark blue, which we removed moving forward to create a compact set of features that explained what constituted as the "best coach" without redundancy. There are a wealth of supervised machine learning methods that we can use, but we have two defined goals: figure out what features make up the best coach and assess how well the graphical model works. To best achieve these goals, we decided to use multiple linear regression to figure out how each feature correlates with the coach's CoachRank value. This is also easy to explain to sports fans.
@@ -448,17 +448,11 @@ Applying the graphical model to other sports are very straightforward. First obt
 
 \end{itemize}
 
-\section{Conclusions}
-With the graphical model, the top 5 coaches for Male College Football are Joe Paterno, Mack Brown, Bear Bryant, Lloyd Carr, Pete Carroll. The top 5 coaches for Male College Basketball are Mike Krzyzewski, Dean Smith, Roy Williams, John Wooden, Rick Pitino. The top 5 coaches for Male College Baseball are Ed Cheff, Mike Martin, Gene Stephenson, Augie Garrido, Gordie Gillespie.
+\section{Conclusions and Future Work}
+We believe our metrics for ranking coaches are justifiable and that our results are believable. The coaches returned by our model are all acclaimed in their sport, and we believe that our objective metrics match well with subjective polls. Finally, we consider our model to make the most complete use of the data we were able to obtain.
 
-\section{Future work}
-\begin{itemize}
-\item Obtain more game data and coach career information, and more information about the coaches to train a better model.
+Given more time, we would have liked to come up with a more objective way of assessing the strengths and weaknesses of our models. We tailored our models to make the most use of the data available, and given more information on each coach we could keep improving our models. Likewise, having more data from each sport would increase the accuracy of our results.
 
-\item Come up with an objective mechanism to assess the result of our ranking, such as incorporating more public sources.
-
-\item Control for more variables such as home/away, team players etc. in our model, and apply the model to more sports.
-\end{itemize}
 
 \pagebreak
 
