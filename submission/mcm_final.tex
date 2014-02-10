@@ -17,7 +17,7 @@
 
 \begin{document}
 \fancyhf{}
-\includegraphics[trim= 100 500 100 100]{summary_sheet.pdf}
+\includegraphics[trim= 100 525 100 100]{summary_sheet.pdf}
 
 In this paper we employ mathematical models, specifically a combination of graphical and machine learning models, to identify the ``all-time greatest male college coach'' of the last century in the last century for basketball, football, and baseball. Since "best" is ambiguous, we employ a more
  qualitative approach to assessing our models' ranked coach lists through a combination of popular polls and general consensus.
@@ -26,13 +26,29 @@ We first consider the available data. We collected career records and postseason
 
 We develop several models of varying complexity. The simplest models rank coaches based on the most easily-collected data, namely career win and loss totals. We discuss the inherent strengths and weaknesses of this approach, and develop a graphical model (which we call CoachRank) that makes more complete use of the data available and better models interactions between the coaches. CoachRank compares pairs of coaches based on games played between them to build a directed graph. We find that CoachRank's "best" coaches list is remarkably in line with top polls and intuitively make sense, and the supervised machine learning models extract championship appearances and win ratio as statistically significant attributes after removing heavily correlated attributes. 
 
+Here we give a preview of CoachRank results for football and basketball, and the results of our simpler model for baseball:
+\begin{center}
+\begin{tabular}{c | c | c | c}
+Rank & Football & Basketball & Baseball\\\hline
+1 & Joe Paterno  & Mike Krzyzewski & Ed Cheff \\
+2 & Mack Brown   & Dean Smith      & Gene Stephenson\\
+3 & Bear Bryant  & Roy Williams    & Mike Martin\\
+4 & Lloyd Carr   & John Wooden     & Augie Garrido\\
+5 & Pete Carroll & Rick Pitino     & Gordie Gillespie\\
+\end{tabular}
+\end{center}
+
+\vspace{2 mm}
+
+Furthermore, to provide intuition to the sports fans about how CoachRank comes up with these ranked lists, we use supervised machine learning methods and variable selection algorithms to extract out the most important coach attributes and comment about extending this model to other genders and sports. 
+
 \pagestyle{fancyplain}
 \fancyhf{}
 \fancyhf[HLE,HRO]{Page \thepage\ of \pageref{LastPage}}
 \fancyhf[HRE,HLO]{Control Number 31406}
 \setlength{\headsep}{0.2in} 
 
-\title{College Coaching Legends}
+\title{College Coaching Legends: CoachRank}
 \author{Control Number 31406}
 \maketitle
 
@@ -72,10 +88,23 @@ The accuracy and relevance of our results depended heavily on the quality and vo
 \noindent We managed to collect a fair amount of data for Football, Basketball, and Baseball, the most popular college sports. All the data for these three sports were taken from Sports-Reference. \cite{SRDATA} For Basketball, we collected the career statistics for all coaches listed, back to 1895, for a total of over 3500 coaches. These statistics include total wins and losses, conference championships and appearances, and NCAA tournament statistics. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every NCAA tournament game. Aforementioned limitations prevented us from collecting outcome data for every regular season game. 
 \\
 
+\noindent For College Basketball there are 8 career statistics features that we will use in our model:
+\begin{itemize}
+\item years$\_$active: number of years the coach has been active
+\item wins: number of games the coach has won
+\item start$\_$year: the year the coach started coaching
+\item ncaa$\_$appearances: number of seasons the coach participated in the conference
+\item games: number of all games played by the coach
+\item ff$\_$appearances: number of final four appearances
+\item conf$\_$tourn$\_$wins: number of conference tournament wins
+\item conf$\_$reg$\_$wins: number of conference regular season wins
+\end{itemize}
+
 \noindent We collected a similar scope of data for Football. We acquired career wins, losses, and bowl game statistics for every Football coach listed, back to 1877, for a total of over 2000 coaches. We also collected per-school statistics for each coach. Finally, we collected the outcomes and point data for every bowl game listed. Once again, time and data policies prevented us from collecting data on every game.
 \\
 
 \noindent For Baseball, we were only able to collect career statistics for about 100 coaches, each with over 1000 wins.\cite{based} That data was backed by a NCAA PDF \cite{NCAAPDF} that was presumably human-entered. Despite the huge gap in data volume, we chose Baseball because we could not find historical data on any level for the other sports listed.
+\\
 
 \subsection{Coaches vs Teams}
 
@@ -175,7 +204,7 @@ $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distri
 
 \subsubsection*{Irreducibility \& Ergodicity}
 
-\noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank algorithm used by Google:
+\noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank\cite{Pagerank} algorithm used by Google:
 
 \begin{enumerate}
 \item Dead-end coaches (coach 4 in the example), will split her vote into equal pieces at each timestep and give one piece to every coach, (go to a random state in the Markov Chain)
@@ -370,8 +399,6 @@ Supersparse Linear Integer Models (SLIM) create predictive scoring systems that 
 
 \section{Results \& Validation}
 
-\subsection{Result of Graphical Model (CoachRank)}
-
 Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
 
 \subsubsection*{Male College Football}
@@ -509,11 +536,16 @@ Applying the graphical model to other sports are very straightforward. First obt
 
 \end{itemize}
 
-\section{Conclusions and Future Work}
-We believe our metrics for ranking coaches are justifiable and that our results are believable. The coaches returned by our model are all acclaimed in their sport, and we believe that our objective metrics match well with subjective polls. Finally, we consider our model to make the most complete use of the data we were able to obtain.
+\section{Conclusions}
+\noindent We believe our metrics for ranking coaches are justifiable and that our results are believable. The coaches returned by our CoachRank graphical model are all acclaimed in their sport, and we believe that our objective metrics match well with subjective polls. Additionally, we confirmed the complicated nature of CoachRank through supervised learning to extract a set of features that intuitively made sense since they were included in the construction of the graphical model and edge weight schemes. On a larger level, we used a graphical model to provide structure to make an unsupervised learning problem into a supervised one. Finally, we consider our model to make the most complete use of the data we were able to obtain.  
 
-Given more time, we would have liked to come up with a more objective way of assessing the strengths and weaknesses of our models. We tailored our models to make the most use of the data available, and given more information on each coach we could keep improving our models. Likewise, having more data from each sport would increase the accuracy of our results.
+\section{Future Work}
 
+\noindent There is a lot of work that can be done to expand on our mathematical models discussed in the paper. To start with, we found it very difficult to come up with a concrete definition of "best coach", so we would spend more time doing due diligence on what constitutes "best". If we are able to quantify "best" we could remove the dependency of the supervised machine learning model on the graphical model. Furthermore, the simplistic models that generated lists of ranked coaches using an absolute metric were rather subjective; we would like to test these subjective metrics on a training set and see how much predictive ability they have on a test set. 
+
+\vspace{2 mm}
+
+\noindent Furthermore, we would have liked to look at the underlying distribution differences between gender to assess whether our mathematical models can in fact be generalized to other sports and genders. We have done initial analysis regarding this in our paper but certainly not enough to guarantee the model working on other genders and sports. Lastly, we would have liked to spend more time on data munging as the data we got is widely varied and in increasing volumes across sports.  
 
 \pagebreak
 
