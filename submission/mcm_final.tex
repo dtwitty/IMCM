@@ -145,7 +145,7 @@ The first idea that came to mind was to apply a topological ordering to the grap
 Rather than a model that required we remove cycles from our graph, we decided it would be best to create a model that relied entirely on the structure of the graph created from the data.
 \\
 
-\noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which the coach can divide up into pieces. The coach can then give the chunks of the vote to different coaches which she thinks is better than herself. We assume the coaches to be rational: the coach doesn't take into account the opinions of amateurs and public media, and she only gives out votes to the coaches who have beaten her. Then we will rank the coaches based on how many votes each coach eventually gets. Since the coaches form a graph in which there might be cycles, at each timestep a coach can be both receiving and giving votes. What we are interested in is the distribution of the votes in the long term.
+\noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which the coach can divide up into pieces. The coach can then give the chunks of the vote to different coaches which he thinks is better than himself. We assume the coaches to be rational: the coach doesn't take into account the opinions of amateurs and public media, and he only gives out votes to the coaches who have beaten him. Then we will rank the coaches based on how many votes each coach eventually gets. Since the coaches form a graph in which there might be cycles, at each timestep a coach can be both receiving and giving votes. What we are interested in is the distribution of the votes in the long term.
 \\
 
 \noindent Consider the following example. There are four coaches: coach 1, coach 2, coach 3, coach 4. Coach 1 has been beaten by coaches 2 and 4, coach 2 has been beaten by coach 3 and coach 4, coach 3 has been beaten by coach 4 and coach 1, coach 4 has never been beaten.
@@ -182,7 +182,7 @@ Rather than a model that required we remove cycles from our graph, we decided it
 \end{tikzpicture}
 \end{center}
 
-\noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of his vote to coach 2 and the other half to 3, coach 2 will give out half of her vote to coach 3 and the other half to coach 4, coach 3 will give out half of her vote to coach 1 and the other half to coach 4. Coach 4, since she never lost to anyone, will simply keep her vote to herself. This can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
+\noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of his vote to coach 2 and the other half to 3, coach 2 will give out half of his vote to coach 3 and the other half to coach 4, coach 3 will give out half of his vote to coach 1 and the other half to coach 4. Coach 4, since he never lost to anyone, will simply keep his vote to himself. This can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
 
 $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 
@@ -206,8 +206,8 @@ $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distri
 \noindent The example we show doesn't satisfy the property because it's possible for coaches to be undefeated. To make sure the matrix we encounter will be irreducible and ergodic, we use a similar technique to the PageRank\cite{Pagerank} algorithm used by Google:
 
 \begin{enumerate}
-\item Dead-end coaches (coach 4 in the example), will split her vote into equal pieces at each timestep and give one piece to every coach, (go to a random state in the Markov Chain)
-\item For non-dead-end coaches (coaches 1, 2, 3 in the example), in each step, will first split their vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion she did what she did before, splitting it and give the pieces to coaches who have beaten her, the remaining $1 - \alpha$ she will split into equal pieces and give one piece to every coach.
+\item Dead-end coaches (coach 4 in the example), will split his vote into equal pieces at each timestep and give one piece to every coach, (go to a random state in the Markov Chain)
+\item For non-dead-end coaches (coaches 1, 2, 3 in the example), in each step, will first split their vote into two, with proportion $\alpha$ and $1 - \alpha$. With the $\alpha$ proportion he did what he did before, splitting it and give the pieces to coaches who have beaten him, the remaining $1 - \alpha$ he will split into equal pieces and give one piece to every coach.
 \end{enumerate}
 
 \noindent Therefore, after adjusting for dead-ends in ${\bf P}$, the new probability transition matrix can be represented as:
@@ -241,7 +241,7 @@ $${\bf D} (i, j) = \alpha {\bf P} (i, j)  + (1-\alpha)\frac{1}{n}$$
 \subsubsection*{Efficient Implementation}
 
 
-Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly could be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use Power Method:
+Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its eigenvalues and eigenvectors directly could be very inefficient computationally. However ${\bf P}$ is a sparse matrix and most of its entries are zero. To make sure we will be able to produce the eigenvector that represents the stationary distribution efficiently, we use the Power Method:
 
 \vspace{5mm}
 
@@ -265,8 +265,8 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 
 \begin{enumerate}
 \item Importance of the game: The more important the game is, the game result will be more informative, and more likely coach $i$ will be to give the vote to coach $j$.
-\item Career: If it is early in the career of coach $i$ when he lost to coach $j$, she is going to put less weight than the game she lost later in her career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone she lost to later in her career.
-\item Game Score: A close game is less convincing than a game entirely dominated by an opponent. Therefore the more points coach $i$ lost, the more convinced she will be to give her vote to her opponent.
+\item Career: If it is early in the career of coach $i$ when he lost to coach $j$, he is going to put less weight than the game he lost later in his career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone he lost to later in him career.
+\item Game Score: A close game is less convincing than a game entirely dominated by an opponent. Therefore the more points coach $i$ lost, the more convinced he will be to give him vote to him opponent.
 \end{enumerate}
 
 \noindent There is more information we can obtain; however, due to the difficulty of data collection, we come up with the following updated formula to calculate the weight for edge weight:
@@ -393,16 +393,16 @@ Supersparse Linear Integer Models (SLIM) create predictive scoring systems that 
 
 \vspace{2 mm}
 
-\noindent A natural question that one may now ask is first how can we extend this trained machine learning models to other time periods and other genders. Well, a nice feature about both the graphical model and the supervised learning model is that they are specifically constructed for specific sports: sure, they might have inputs as "final four appearances" or "bowl games", but almost every sport has major competitions and team games that can be substituted for this. Additionally, not where in either model do we construct the model on any gender specific criteria, so our assumption is that these models above will hold for both genders \textit{assuming} both genders have similar abstract characteristics, which we believe at a first order approximation to be true but would test rigorously if we had more time. As far as different time periods go for the machine learning method, we partitioned the coaches into different data sets depending on their start year and found that the most significant extracted features were in fact largely the same, which is no surprise because there should not be a significant difference between the most important features that determine the best coach between different time periods. However, it is important to note for earlier time periods (1913-1940), there were less features that were found as statistically significant which might mean that the notion of "best" coach was more simplistic way back when but now has grown more complicated as the game and society have evolved: an interesting observation.    
+\noindent A natural question that one may now ask is how can we extend this trained machine learning models to other time periods and other genders. Well, a nice feature about both the graphical model and the supervised learning model is that they are constructed for specific sports: sure, they might have inputs as "final four appearances" or "bowl games", but almost every sport has major competitions and team games that can be substituted for this. Additionally, nowhere in either model do we use gender specific criteria, so our assumption is that these models above will hold for both genders \textit{assuming} both genders have similar abstract characteristics, which we believe at a first order approximation to be true but would test rigorously if we had more time. As far as different time periods go for the machine learning methods, we partitioned the coaches into different data sets depending on their start year and found that the most significant extracted features were in fact largely the same, which is no surprise because there should not be a significant difference between the most important features that determine the best coach between different time periods. However, it is important to note for earlier time periods (1913-1940), there were less features that were found as statistically significant which might mean that the notion of "best" coach was more simplistic way back when but now has grown more complicated as the game and society have evolved: an interesting observation.     
 
 
 \section{Results \& Validation}
 
-Using the Markov Chain model with the edge weight function that takes game's importance, and score difference into account, we computed the following result and showed the top five coaches for Male College Football and Male College Basketball:
+Below we present the results of our graphical model. Using the graphical model with edge weights that take game importance and score difference into account, we computed the following results and showed the top five coaches for Male College Football, Male College Basketball, and Male College Baseball:
 
 \subsubsection*{Male College Football}
 
-\noindent The graph $G(V, E)$ for Male College Football have 529 nodes, 1032 edges, and 27 weakly connected components. The fact that there is no one single connected component is possibly due to the small size of our dataset. The top five coaches are:
+\noindent The graph $G(V, E)$ for Male College Football has 529 nodes, 1032 edges, and 27 weakly connected components. The fact that there is no one single connected component is possibly due to the small size of our dataset. The top five coaches are:
 
 \begin{center}
 \begin{tabular}{ | c | c | }
@@ -419,7 +419,7 @@ Pete Carroll & 0.01338 \\
 
 \subsubsection*{Male College Basketball}
 
-\noindent The graph $G(V, E)$ for Male College Basketball have 763 nodes, 2582 edges, and 1 weakly connected component. The fact that $G$ is weakly connected is really useful in that it allow us to compare every two coaches in the graph, even though they are playing in different time horizon. The top five coaches are:
+\noindent The graph $G(V, E)$ for Male College Basketball has 763 nodes, 2582 edges, and 1 weakly connected component. The fact that $G$ is weakly connected is really useful because it allows us to compare every two coaches in the graph, even though they came from different time horizon. The top five coaches are:
 
 \begin{center}
 \begin{tabular}{ | c | c | }
@@ -436,7 +436,8 @@ Rick Pitino  & 0.02066 \\
 
 \subsubsection*{Male College Baseball}
 
-Due to the lack of connectivity data between baseball coaches, we resort to sorting by scaled win ratio.
+Due to the lack of game data between baseball coaches, we resort to sorting by scaled win ratio.
+
 \begin{center}
 \begin{tabular}{ | c | c | c| c | }
 \hline
@@ -450,7 +451,9 @@ Gordie Gillespie & 1259.56 \\
 \end{tabular}
 \end{center}
 
-\noindent If we plot the Vote \% of all the College Basketball coaches from high to low, we can get the following histogram. Similar graphs were computed for Baseball and Football.
+\subsubsection*{Analysis of Results}
+
+\noindent If we plot the sorted vote \% of all the College Basketball coaches, we can get the following histogram. Similar graphs were computed for Baseball and Football.
 
 \begin{figure}[H]
       \centering
@@ -476,7 +479,7 @@ If we plot the vote \% of all the College Basketball coaches over the start year
 \noindent We can see from the graph that the scores of the coaches have a positive correlation with the start-year of their career. This is reasonable because first techniques of sports tend to improve overtime and second due to the shortage of data for earlier periods we have more connectivity for coaches in later periods in the graphical model.
 \\
 
-\noindent We also run the graphical model in separate time periods, and the results for the different periods (1900-1930, 1930-1970, 1970-2010) are reasonable baed on information from public polls and professional sports media. Here are the results of segmenting our dataset into three time periods.
+\noindent We also run the graphical model in separate time periods, and the results for the different periods (1900-1930, 1930-1970, 1970-2010) are reasonable based on information from public polls and professional sports media. Here are the results of segmenting our dataset into three time periods.
 
 \begin{center}
 
@@ -508,7 +511,7 @@ Applying the graphical model to other sports are very straightforward. First obt
 
 \subsubsection*{Assessment}
 
-\noindent Due to the subjective nature of this problem, assessment of the results can be tricky. By comparing both of our results with public polls and professional sports media such as ESPN and Fox News, etc., and looking at the achievements of the top coaches, we conclude that the result is consistent with public opinions.
+\noindent Due to the subjective nature of this problem, assessment of the results can be tricky. By comparing both of our results with public polls and professional sports media such as ESPN and Fox News, etc., and looking at the achievements of the top coaches, we conclude that the results are consistent with public opinions.
 
 \subsubsection*{Robustness}
 
@@ -520,14 +523,14 @@ Applying the graphical model to other sports are very straightforward. First obt
 \begin{itemize}
 \item The graphical model allows us to be more objective in our ranking algorithm since we can understand it as the coaches voting among themselves based on their game history, instead of arbitrary tweaking of heuristics.
 
-\item We take into account not only the career data of a coach, but also the game result, game score, and the game importance of the games they play against each other.
+\item We take into account not only the career data of a coach, but also the results, score differences, and importance of the games they play against each other.
 
-\item We have an efficient implementation of using the power method to calculate the stationary distribution of the Markov Chain, and the results show clear differentiation between coaches, especially high-ranking ones.
+\item We have an efficient implementation using the Power Method to calculate the stationary probability distribution of the Markov Chain, and the results show clear differentiation between coaches, especially high-ranking ones.
 \end{itemize}
 
 \subsection{Weaknesses}
 \begin{itemize}
-\item Due to the limited amount of data we could collect, we could not consider coaches not in our dataset. For example, John Gagliardi, the coach with the most wins in college Football history, was not in our data set because he competed in the NAIA and NCAA Division III leagues. 
+\item Due to the limited amount of data we could collect, we could not consider coaches not in our dataset. For example, John Gagliardi, the coach with the most wins in college Football history, was not in our data set because he competed in the NAIA and NCAA Division III leagues.
 
 \item Our graphical model used only postseason games as input. We justify this heuristically by saying that only skilled coaches will be play in the postseason. However, this produces somewhat sparse graphs, especially compared to those we could have generated if we were able to collect data on every game.
 
