@@ -142,7 +142,7 @@ The first idea that came to mind was to apply a topological ordering to the grap
 \noindent The major problem with this approach has to do with cycles. In order to construct a topological sort, we would either need a graph with no cycles (implying an already-existing partial order on coaches), or a mechanism for removing cycles from the graph. We could not create a satisfactory heuristic for removing cycles (that is, one that didn't seem too arbitrary).
 
 \subsubsection{Markov Chain (CoachRank)}
-Rather than a model that required we remove cycles from our graph, we decided it would be best to create a model that relied entirely on the structure of the graph created from the data.
+Rather than a model that requires we remove cycles from our graph, we decided it would be best to create a model that relied entirely on the structure of the graph created from the data.
 \\
 
 \noindent Imagine instead of having us, the spectators doing the voting and the ordering, each coach will have a $\bf{vote}$ of a certain $\bf{size}$, which the coach can divide up into pieces. The coach can then give the chunks of the vote to different coaches which he thinks is better than himself. We assume the coaches to be rational: the coach doesn't take into account the opinions of amateurs and public media, and he only gives out votes to the coaches who have beaten him. Then we will rank the coaches based on how many votes each coach eventually gets. Since the coaches form a graph in which there might be cycles, at each timestep a coach can be both receiving and giving votes. What we are interested in is the distribution of the votes in the long term.
@@ -182,7 +182,7 @@ Rather than a model that required we remove cycles from our graph, we decided it
 \end{tikzpicture}
 \end{center}
 
-\noindent The Markov Chain above shows how the vote will be given out at each timestep: coach 1 will give out half of his vote to coach 2 and the other half to 3, coach 2 will give out half of his vote to coach 3 and the other half to coach 4, coach 3 will give out half of his vote to coach 1 and the other half to coach 4. Coach 4, since he never lost to anyone, will simply keep his vote to himself. This can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
+\noindent The Markov Chain above shows how the votes will be given out at each timestep: coach 1 will give out half of his vote to coach 2 and the other half to 3, coach 2 will give out half of his vote to coach 3 and the other half to coach 4, coach 3 will give out half of his vote to coach 1 and the other half to coach 4. Coach 4, since he never lost to anyone, will simply keep his vote to himself. This can be modeled as a Markov Chain, and the distribution of votes at some large time is the stationary probability distribution of this Markov Chain:
 
 $$ \pi = \lim_{n \rightarrow \infty} \phi_{0} P^n \mbox{ for some initial distribution } \phi_{0}$$
 
@@ -265,8 +265,8 @@ Since the matrix ${\bf D}$ is huge and all entries are non zero, calculating its
 
 \begin{enumerate}
 \item Importance of the game: The more important the game is, the game result will be more informative, and more likely coach $i$ will be to give the vote to coach $j$.
-\item Career: If it is early in the career of coach $i$ when he lost to coach $j$, he is going to put less weight than the game he lost later in his career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give vote to someone he lost to later in him career.
-\item Game Score: A close game is less convincing than a game entirely dominated by an opponent. Therefore the more points coach $i$ lost, the more convinced he will be to give him vote to him opponent.
+\item Career: If it is early in the career of coach $i$ when he lost to coach $j$, he is going to put less weight than the game he lost later in his career, since it is typical for a coach to learn from failure early and become a better coach later. Therefore coach $i$ will be more convinced to give votes to someone he lost to later in him career.
+\item Game Score: A close game is less convincing than a game entirely dominated by an opponent. Therefore the more points coach $i$ lost, the more convinced he will be to give votes to his opponent.
 \end{enumerate}
 
 \noindent There is more information we can obtain; however, due to the difficulty of data collection, we come up with the following updated formula to calculate the weight for edge weight:
@@ -296,7 +296,7 @@ $$(v_i, v_j) \in E \mbox{ if } w(v_i, v_j) > 0$$
 \noindent The intuition for this formula is really straightforward: for example, if a coach lost 30 points in championship game, it definitely is going matter much more than a loss of 4 points in an early-season game. The weight for an edge is a combination of the two factors: the importance of the game and the score difference.
 
 \subsubsection*{Parameter Estimation}
-\noindent $h:$ we let $h = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of sub-game is, the more it is valued. Say for example that a team  plays 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in college Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
+\noindent $h:$ we let $h = (\text{number of games of a given importance})^{-1}$. The reason for this approximation is clear, the less frequent a type of game is, the more it is valued. Say for example that a team  plays 30 regular season games, 5 tournament games, and 1 championship game, then $h(\mbox{season}) = 1/30$, $h(\mbox{tournament}) = 1/5$, $h(\mbox{championship}) = 1$. Similarly, in College Football, $h(\mbox{season}) = 1/12$, $h(\mbox{playoff}) = 1/12$, $h(\mbox{championship}) = 1$
 \\
 
 \noindent Let $\beta:$ be the inverse of the median of score differences of a sport in the data. From the data, we calculated the median and set $\beta_{basketball} = \frac{1}{9}$, $\beta_{football} = \frac{1}{10}$. We do not use the mean because there are outliers in the score difference distribution, as we can see in the following graph:
