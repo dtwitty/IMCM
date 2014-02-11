@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  10 FEB 2014 19:29
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  10 FEB 2014 19:31
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -473,139 +473,140 @@ Package Fancyhdr Warning: \headheight is too small (0.0pt):
 \tf@toc=\write4
 \openout4 = `mcm_final.toc'.
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 73.
+ [3]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 75.
  (/usr/local/texlive/2013/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 73.
- [3]
-Underfull \hbox (badness 10000) in paragraph at lines 81--83
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 75.
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--85
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 84--86
+Underfull \hbox (badness 10000) in paragraph at lines 86--88
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--89
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 102--104
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 105--107
+Underfull \hbox (badness 10000) in paragraph at lines 89--91
 
  []
 
 [4]
-Underfull \hbox (badness 10000) in paragraph at lines 110--112
+Underfull \hbox (badness 10000) in paragraph at lines 104--106
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--109
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 112--114
 
  []
 
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 133--135
+Underfull \hbox (badness 10000) in paragraph at lines 135--137
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 139--141
+Underfull \hbox (badness 10000) in paragraph at lines 141--143
+
+ []
+
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 147--149
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 145--147
+Underfull \hbox (badness 10000) in paragraph at lines 150--152
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 148--150
-
- []
-
-[6] [7]
-Underfull \hbox (badness 10000) in paragraph at lines 217--219
+[7]
+Underfull \hbox (badness 10000) in paragraph at lines 219--221
 
  []
 
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 273--275
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 294--296
+Underfull \hbox (badness 10000) in paragraph at lines 275--277
 
  []
 
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 300--302
+Underfull \hbox (badness 10000) in paragraph at lines 296--298
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 303--305
+Underfull \hbox (badness 10000) in paragraph at lines 302--304
 
  []
 
-<graphs/basketball_diff_dist.png, id=82, 610.28pt x 314.17375pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 305--307
+
+ []
+
+<graphs/basketball_diff_dist.png, id=81, 610.28pt x 314.17375pt>
 File: graphs/basketball_diff_dist.png Graphic file (type png)
  <use graphs/basketball_diff_dist.png>
-Package pdftex.def Info: graphs/basketball_diff_dist.png used on input line 310.
+Package pdftex.def Info: graphs/basketball_diff_dist.png used on input line 312.
 (pdftex.def)             Requested size: 248.0298pt x 127.6855pt.
 
-Overfull \hbox (22.54941pt too wide) in paragraph at lines 310--311
+Overfull \hbox (22.54941pt too wide) in paragraph at lines 312--313
  [][] 
  []
 
-<graphs/football_diff_dist.png, id=83, 610.28pt x 314.17375pt>
+<graphs/football_diff_dist.png, id=82, 610.28pt x 314.17375pt>
 File: graphs/football_diff_dist.png Graphic file (type png)
  <use graphs/football_diff_dist.png>
-Package pdftex.def Info: graphs/football_diff_dist.png used on input line 314.
+Package pdftex.def Info: graphs/football_diff_dist.png used on input line 316.
 (pdftex.def)             Requested size: 248.0298pt x 127.6855pt.
 
-Overfull \hbox (22.54941pt too wide) in paragraph at lines 314--315
+Overfull \hbox (22.54941pt too wide) in paragraph at lines 316--317
  [][] 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 318--320
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 320--322
 
  []
 
-[10 <./graphs/basketball_diff_dist.png (PNG copy)> <./graphs/football_diff_dist.png (PNG copy)>] <bball_cor.png, id=87, 403.5075pt x 295.1025pt>
+<bball_cor.png, id=87, 403.5075pt x 295.1025pt>
 File: bball_cor.png Graphic file (type png)
  <use bball_cor.png>
-Package pdftex.def Info: bball_cor.png used on input line 334.
+Package pdftex.def Info: bball_cor.png used on input line 336.
 (pdftex.def)             Requested size: 258.36668pt x 188.955pt.
- [11 <./bball_cor.png>] <fixedplot.png, id=94, 610.28pt x 314.17375pt>
+ [11 <./graphs/basketball_diff_dist.png (PNG copy)> <./graphs/football_diff_dist.png (PNG copy)>] [12 <./bball_cor.png>] <fixedplot.png, id=97, 610.28pt x 314.17375pt>
 File: fixedplot.png Graphic file (type png)
  <use fixedplot.png>
-Package pdftex.def Info: fixedplot.png used on input line 369.
+Package pdftex.def Info: fixedplot.png used on input line 371.
 (pdftex.def)             Requested size: 469.75502pt x 241.83783pt.
- [12] [13 <./fixedplot.png (PNG copy)>] [14] <graphs/basketball_score_dist.png, id=105, 610.28pt x 314.17375pt>
+ [13 <./fixedplot.png (PNG copy)>] [14] <graphs/basketball_score_dist.png, id=105, 610.28pt x 314.17375pt>
 File: graphs/basketball_score_dist.png Graphic file (type png)
  <use graphs/basketball_score_dist.png>
-Package pdftex.def Info: graphs/basketball_score_dist.png used on input line 461.
+Package pdftex.def Info: graphs/basketball_score_dist.png used on input line 463.
 (pdftex.def)             Requested size: 469.75502pt x 241.83783pt.
  [15] <graphs/time_horizon.png, id=109, 610.28pt x 314.17375pt>
 File: graphs/time_horizon.png Graphic file (type png)
  <use graphs/time_horizon.png>
-Package pdftex.def Info: graphs/time_horizon.png used on input line 477.
+Package pdftex.def Info: graphs/time_horizon.png used on input line 479.
 (pdftex.def)             Requested size: 469.75502pt x 241.83783pt.
  [16 <./graphs/basketball_score_dist.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 480--482
+Underfull \hbox (badness 10000) in paragraph at lines 482--484
 
  []
 
 [17 <./graphs/time_horizon.png (PNG copy)>] [18] [19]
-Overfull \hbox (61.71072pt too wide) in paragraph at lines 562--564
+Overfull \hbox (61.71072pt too wide) in paragraph at lines 564--566
 []\OT1/cmr/m/n/10.95 Baseball Data, []\OT1/cmtt/m/n/10.95 http://en.wikipedia.org/wiki/List_of_college_baseball_coaches_with_1,000_wins 
  []
 
@@ -615,13 +616,13 @@ AED: lastpage setting LastPage
 Here is how much of TeX's memory you used:
  12807 strings out of 493315
  235095 string characters out of 6137904
- 279688 words of memory out of 5000000
+ 278688 words of memory out of 5000000
  15979 multiletter control sequences out of 15000+600000
  12795 words of font info for 48 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  56i,13n,68p,1545b,555s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on /Users/dominick/Documents/IMCM/submission/.texpadtmp/mcm_final.pdf (20 pages, 403824 bytes).
+Output written on /Users/dominick/Documents/IMCM/submission/.texpadtmp/mcm_final.pdf (20 pages, 403521 bytes).
 PDF statistics:
  185 PDF objects out of 1000 (max. 8388607)
  126 compressed objects within 2 object streams
